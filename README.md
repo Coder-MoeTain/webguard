@@ -6,6 +6,10 @@
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
 </p>
 
+<p align="center">
+  <img src="https://placehold.co/1200x300/0f172a/38bdf8?text=WebGuard+RF+-+ML+Web+Attack+Detection" alt="WebGuard RF Banner" width="100%" />
+</p>
+
 <h1 align="center">WebGuard RF</h1>
 <p align="center">
   <strong>Machine Learning Driven Detection of SQLi, XSS, and CSRF</strong>
@@ -14,11 +18,16 @@
   A production-style research framework for detecting web application attacks using Random Forest classification.
 </p>
 
+<p align="center">
+  <strong>Author:</strong> <a href="https://github.com/Coder-X">Coder-X</a>
+</p>
+
 ---
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
@@ -38,6 +47,33 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <strong>Dashboard Overview</strong>
+</p>
+<p align="center">
+  <img src="https://placehold.co/1200x600/1e293b/64748b?text=Dashboard+Overview" alt="Dashboard" width="90%" />
+</p>
+
+<p align="center">
+  <strong>Training Configuration</strong>
+</p>
+<p align="center">
+  <img src="https://placehold.co/800x500/1e293b/64748b?text=Training+Configuration" alt="Training Config" width="90%" />
+</p>
+
+<p align="center">
+  <strong>Inference Testing</strong>
+</p>
+<p align="center">
+  <img src="https://placehold.co/800x500/1e293b/64748b?text=Inference+Testing" alt="Inference Testing" width="90%" />
+</p>
+
+> Replace placeholder images with your screenshots in `docs/images/` (banner.png, dashboard.png, training.png, inference.png).
+
+---
+
 ## Features
 
 | Feature | Description |
@@ -54,6 +90,10 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 ---
 
 ## Architecture
+
+<p align="center">
+  <img src="https://placehold.co/1000x400/0f172a/334155?text=Architecture+Diagram" alt="Architecture Diagram" width="90%" />
+</p>
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -261,5 +301,10 @@ See [`.gitignore`](.gitignore) for the full list.
 ## License
 
 MIT License — Research and educational use.
-#   w e b g u a r d  
- 
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ by <a href="https://github.com/Coder-X">Coder-X</a></strong>
+</p>
+
