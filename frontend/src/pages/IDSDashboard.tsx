@@ -1,0 +1,303 @@
+import { useState, useEffect, useRef } from 'react'
+import { Shield, AlertTriangle, Activity, BarChart3, Play, Square, Trash2 } from 'lucide-react'
+import { ids } from '../services/api'
+
+interface Alert {
+  id: string
+  timestamp: number
+  prediction: string
+  confidence: number
+  method: string
+  url: string
+  payload_preview: string
+  source_ip: string
+  severity: string
+  top_indicators: string[]
+}
+
+interface Stats {
+  total_analyzed: number
+  attacks_detected: number
+  benign: number
+  alerts_count: number
+  attack_rate?: number
+}
+
+const TRAFFIC_SAMPLES = [
+  { type: 'sqli', payload: "' OR 1=1--" },
+  { type: 'sqli', payload: "admin'--" },
+  { type: 'xss', payload: "<script>alert(1)</script>" },
+  { type: 'xss', payload: "<img onerror=alert(1)>" },
+  { type: 'csrf', payload: "POST /transfer (no token)" },
+  { type: 'benign', payload: "laptop" },
+  { type: 'benign', payload: "user@email.com" },
+]
+
+export default function IDSDashboard() {
+  const [alerts, setAlerts] = useState<Alert[]>([])
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [testPayload, setTestPayload] = useState("' OR 1=1--")
+  const [lastResult, setLastResult] = useState<{ prediction: string; confidence: number; alert_raised: boolean } | null>(null)
+  const [simulatorRunning, setSimulatorRunning] = useState(false)
+  const simulatorRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const fetchData = async () => {
+    try {
+      const [alertsRes, statsRes] = await Promise.all([
+        ids.alerts({ limit: 50 }),
+        ids.stats(),
+      ])
+      setAlerts(alertsRes.data.alerts || [])
+      setStats(statsRes.data)
+    } catch {
+      setStats({ total_analyzed: 0, attacks_detected: 0, benign: 0, alerts_count: 0 })
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+    const interval = setInterval(fetchData, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const runTest = async () => {
+    setLastResult(null)
+    try {
+      const { data } = await ids.analyze({
+        method: 'GET',
+        url: '/search',
+        query_params: testPayload,
+      })
+      setLastResult({
+        prediction: data.prediction,
+        confidence: data.confidence,
+        alert_raised: data.alert_raised,
+      })
+      fetchData()
+    } catch {
+      setLastResult({ prediction: 'Error', confidence: 0, alert_raised: false })
+    }
+  }
+
+  const startSimulator = () => {
+    if (simulatorRunning) return
+    setSimulatorRunning(true)
+    simulatorRef.current = setInterval(async () => {
+      const sample = TRAFFIC_SAMPLES[Math.floor(Math.random() * TRAFFIC_SAMPLES.length)]
+      try {
+        await ids.analyze({
+          method: 'GET',
+          url: '/search',
+          query_params: sample.payload,
+        })
+        fetchData()
+      } catch {}
+    }, 2500)
+  }
+
+  const stopSimulator = () => {
+    if (simulatorRef.current) {
+      clearInterval(simulatorRef.current)
+      simulatorRef.current = null
+    }
+    setSimulatorRunning(false)
+  }
+
+  useEffect(() => () => stopSimulator(), [])
+
+  const severityColor: Record<string, string> = {
+    critical: 'var(--danger)',
+    high: '#f97316',
+    medium: 'var(--warning)',
+    low: 'var(--accent)',
+    info: 'var(--text-muted)',
+  }
+
+  return (
+    <div>
+      <h1 style={{ margin: '0 0 1rem', fontSize: '1.75rem' }}>Real-time IDS Dashboard</h1>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+        WebGuard RF Intrusion Detection System — Random Forest powered detection of SQLi, XSS, CSRF
+      </p>
+
+      {/* Stats cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <Activity size={20} style={{ color: 'var(--accent)' }} />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Requests Analyzed</span>
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{stats?.total_analyzed ?? 0}</div>
+        </div>
+        <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <AlertTriangle size={20} style={{ color: 'var(--danger)' }} />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Attacks Detected</span>
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--danger)' }}>{stats?.attacks_detected ?? 0}</div>
+        </div>
+        <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <Shield size={20} style={{ color: 'var(--success)' }} />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Benign</span>
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--success)' }}>{stats?.benign ?? 0}</div>
+        </div>
+        <div style={{ padding: '1.25rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <BarChart3 size={20} style={{ color: 'var(--accent)' }} />
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Attack Rate</span>
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+            {stats?.total_analyzed ? ((stats.attacks_detected / stats.total_analyzed) * 100).toFixed(1) : 0}%
+          </div>
+        </div>
+      </div>
+
+      {/* Test & Simulator */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <h3 style={{ margin: '0 0 1rem', fontSize: '1rem' }}>Test Request</h3>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <input
+              value={testPayload}
+              onChange={(e) => setTestPayload(e.target.value)}
+              placeholder="Enter payload..."
+              style={{
+                flex: 1,
+                padding: '0.6rem',
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--bg-card)',
+                borderRadius: 4,
+                color: 'var(--text)',
+                fontFamily: 'var(--font-mono)',
+              }}
+            />
+            <button
+              onClick={runTest}
+              style={{
+                padding: '0.6rem 1rem',
+                background: 'var(--accent)',
+                border: 'none',
+                borderRadius: 4,
+                color: 'var(--bg-primary)',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Analyze
+            </button>
+          </div>
+          {lastResult && (
+            <div style={{
+              marginTop: '0.75rem',
+              padding: '0.75rem',
+              background: lastResult.prediction !== 'benign' ? 'rgba(248,113,113,0.15)' : 'rgba(74,222,128,0.15)',
+              borderRadius: 4,
+              border: `1px solid ${lastResult.prediction !== 'benign' ? 'var(--danger)' : 'var(--success)'}`,
+            }}>
+              <strong>{lastResult.prediction}</strong> ({(lastResult.confidence * 100).toFixed(1)}%)
+              {lastResult.alert_raised && ' — Alert raised'}
+            </div>
+          )}
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <h3 style={{ margin: '0 0 1rem', fontSize: '1rem' }}>Traffic Simulator</h3>
+          <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Generate simulated attack traffic to test the IDS in real-time.
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={startSimulator}
+              disabled={simulatorRunning}
+              style={{
+                padding: '0.6rem 1rem',
+                background: simulatorRunning ? 'var(--bg-card)' : 'var(--success)',
+                border: 'none',
+                borderRadius: 4,
+                color: 'var(--text)',
+                cursor: simulatorRunning ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <Play size={16} /> {simulatorRunning ? 'Running...' : 'Start'}
+            </button>
+            <button
+              onClick={stopSimulator}
+              disabled={!simulatorRunning}
+              style={{
+                padding: '0.6rem 1rem',
+                background: 'var(--danger)',
+                border: 'none',
+                borderRadius: 4,
+                color: 'white',
+                cursor: simulatorRunning ? 'pointer' : 'default',
+                opacity: simulatorRunning ? 1 : 0.5,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <Square size={16} /> Stop
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Live alerts */}
+        <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+          <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertTriangle size={20} style={{ color: 'var(--danger)' }} />
+              Live Alerts ({alerts.length})
+            </span>
+            <button
+              onClick={async () => { await ids.clear(); fetchData(); }}
+              style={{ padding: '0.35rem 0.75rem', background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 4, color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <Trash2 size={14} /> Clear
+            </button>
+          </h3>
+        {alerts.length === 0 ? (
+          <p style={{ color: 'var(--text-muted)', margin: 0 }}>No alerts yet. Send test requests or start the traffic simulator.</p>
+        ) : (
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--bg-card)', position: 'sticky', top: 0, background: 'var(--bg-secondary)' }}>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Time</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Type</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Confidence</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Method</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Payload</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {alerts.map((a) => (
+                  <tr key={a.id} style={{ borderBottom: '1px solid var(--bg-card)' }}>
+                    <td style={{ padding: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {new Date(a.timestamp * 1000).toLocaleTimeString()}
+                    </td>
+                    <td style={{ padding: '0.5rem' }}>
+                      <span style={{ color: severityColor[a.severity] || 'var(--text)' }}>{a.prediction}</span>
+                    </td>
+                    <td style={{ padding: '0.5rem' }}>{(a.confidence * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '0.5rem' }}>{a.method}</td>
+                    <td style={{ padding: '0.5rem', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }} title={a.payload_preview}>
+                      <code style={{ fontSize: '0.8rem' }}>{a.payload_preview.slice(0, 40)}{a.payload_preview.length > 40 ? '...' : ''}</code>
+                    </td>
+                    <td style={{ padding: '0.5rem', fontSize: '0.8rem' }}>{a.source_ip}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
