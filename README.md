@@ -327,6 +327,6 @@ MIT License — Research and educational use.
 ---
 
 <p align="center">
-  <strong>Made with ❤️ by <a href="https://github.com/Coder-X">Coder-X</a></strong>
+  <strong>Made with ❤️ by <a href="https://github.com/Coder-MoeTain">Coder-X</a></strong>
 </p>
 
