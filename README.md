@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <strong>Author:</strong> <a href="https://github.com/Coder-X">Coder-X</a>
+  <strong>Author:</strong> <a href="https://github.com/Coder-MoeTain">Coder-X</a>
 </p>
 
 ---
