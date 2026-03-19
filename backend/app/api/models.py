@@ -4,15 +4,27 @@ WebGuard RF - Models API
 
 import joblib
 from pathlib import Path
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from ..core.config import settings
 from ..core.deps import get_current_user
 from ..core.paths import resolve_data_path
+from ..services.job_store import list_jobs
 
 router = APIRouter()
 _MODELS_DIR = resolve_data_path(settings.MODELS_DIR)
+
+
+def _get_model_metrics_map():
+    """Build model_id -> metrics from completed training jobs."""
+    model_metrics = {}
+    for job in list_jobs(limit=500):
+        if job.get("phase") == "completed" and job.get("metrics"):
+            mid = job["metrics"].get("model_id")
+            if mid:
+                model_metrics[mid] = job["metrics"]
+    return model_metrics
 
 
 @router.post("/reset")
@@ -29,7 +41,10 @@ def reset_models(user: dict = Depends(get_current_user)):
 
 
 @router.get("/")
-def list_models(user: dict = Depends(get_current_user)):
+def list_models(
+    include_metrics: bool = Query(False, description="Include test/train/val metrics per model"),
+    user: dict = Depends(get_current_user),
+):
     models_dir = _MODELS_DIR
     if not models_dir.exists():
         return {"models": []}
@@ -37,6 +52,27 @@ def list_models(user: dict = Depends(get_current_user)):
     for f in models_dir.glob("*.joblib"):
         if "_preprocessor" not in f.name:
             models.append({"id": f.stem, "path": str(f), "name": f.name})
+
+    if include_metrics:
+        metrics_map = _get_model_metrics_map()
+        for m in models:
+            metrics = metrics_map.get(m["id"])
+            if metrics:
+                m["metrics"] = metrics
+                test = metrics.get("test") or {}
+                m["test_accuracy"] = test.get("accuracy")
+                m["test_f1_macro"] = test.get("f1_macro")
+                m["test_precision_macro"] = test.get("precision_macro")
+                m["test_recall_macro"] = test.get("recall_macro")
+                m["train_time_seconds"] = metrics.get("train_time_seconds")
+            else:
+                m["metrics"] = None
+                m["test_accuracy"] = None
+                m["test_f1_macro"] = None
+                m["test_precision_macro"] = None
+                m["test_recall_macro"] = None
+                m["train_time_seconds"] = None
+
     return {"models": models}
 
 

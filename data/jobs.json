@@ -1554,5 +1554,579 @@
         "classification_mode": "multiclass"
       }
     }
+  },
+  "a64cf467-8e9": {
+    "phase": "failed",
+    "progress": 0,
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 15,
+    "n_estimators": 500,
+    "error": "\nAll the 30 fits failed.\nIt is very likely that your model is misconfigured.\nYou can try to debug the error by setting error_score='raise'.\n\nBelow are more details about the failures:\n--------------------------------------------------------------------------------\n10 fits failed with the following error:\nTraceback (most recent call last):\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\model_selection\\_validation.py\", line 859, in _fit_and_score\n    estimator.fit(X_train, y_train, **fit_params)\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\base.py\", line 1365, in wrapper\n    return fit_method(estimator, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\ensemble\\_forest.py\", line 359, in fit\n    X, y = validate_data(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 2971, in validate_data\n    X, y = check_X_y(X, y, **check_params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 1368, in check_X_y\n    X = check_array(\n        ^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 971, in check_array\n    array = array.astype(new_dtype)\n            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\generic.py\", line 6240, in astype\n    new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 448, in astype\n    return self.apply(\"astype\", dtype=dtype, copy=copy, errors=errors)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 352, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\blocks.py\", line 526, in astype\n    new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 299, in astype_array_safe\n    new_values = astype_array(values, dtype, copy=copy)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 230, in astype_array\n    values = astype_nansafe(values, dtype, copy=copy)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 170, in astype_nansafe\n    return arr.astype(dtype, copy=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: could not convert string to float: '609cb521-837f-45d0-b3be-c39ff0c09359'\n\n--------------------------------------------------------------------------------\n20 fits failed with the following error:\nTraceback (most recent call last):\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\model_selection\\_validation.py\", line 859, in _fit_and_score\n    estimator.fit(X_train, y_train, **fit_params)\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\base.py\", line 1365, in wrapper\n    return fit_method(estimator, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\ensemble\\_forest.py\", line 359, in fit\n    X, y = validate_data(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 2971, in validate_data\n    X, y = check_X_y(X, y, **check_params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 1368, in check_X_y\n    X = check_array(\n        ^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 971, in check_array\n    array = array.astype(new_dtype)\n            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\generic.py\", line 6240, in astype\n    new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 448, in astype\n    return self.apply(\"astype\", dtype=dtype, copy=copy, errors=errors)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 352, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\blocks.py\", line 526, in astype\n    new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 299, in astype_array_safe\n    new_values = astype_array(values, dtype, copy=copy)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 230, in astype_array\n    values = astype_nansafe(values, dtype, copy=copy)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 170, in astype_nansafe\n    return arr.astype(dtype, copy=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: could not convert string to float: '73a8076a-fc45-47b8-b4f8-642b1585d8bc'\n"
+  },
+  "171882b7-3e3": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\77713cad.parquet",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 15,
+    "n_estimators": 500,
+    "error": "\nAll the 30 fits failed.\nIt is very likely that your model is misconfigured.\nYou can try to debug the error by setting error_score='raise'.\n\nBelow are more details about the failures:\n--------------------------------------------------------------------------------\n10 fits failed with the following error:\nTraceback (most recent call last):\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\model_selection\\_validation.py\", line 859, in _fit_and_score\n    estimator.fit(X_train, y_train, **fit_params)\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\base.py\", line 1365, in wrapper\n    return fit_method(estimator, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\ensemble\\_forest.py\", line 359, in fit\n    X, y = validate_data(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 2971, in validate_data\n    X, y = check_X_y(X, y, **check_params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 1368, in check_X_y\n    X = check_array(\n        ^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 971, in check_array\n    array = array.astype(new_dtype)\n            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\generic.py\", line 6240, in astype\n    new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 448, in astype\n    return self.apply(\"astype\", dtype=dtype, copy=copy, errors=errors)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 352, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\blocks.py\", line 526, in astype\n    new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 299, in astype_array_safe\n    new_values = astype_array(values, dtype, copy=copy)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 230, in astype_array\n    values = astype_nansafe(values, dtype, copy=copy)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 170, in astype_nansafe\n    return arr.astype(dtype, copy=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: could not convert string to float: '609cb521-837f-45d0-b3be-c39ff0c09359'\n\n--------------------------------------------------------------------------------\n20 fits failed with the following error:\nTraceback (most recent call last):\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\model_selection\\_validation.py\", line 859, in _fit_and_score\n    estimator.fit(X_train, y_train, **fit_params)\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\base.py\", line 1365, in wrapper\n    return fit_method(estimator, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\ensemble\\_forest.py\", line 359, in fit\n    X, y = validate_data(\n           ^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 2971, in validate_data\n    X, y = check_X_y(X, y, **check_params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 1368, in check_X_y\n    X = check_array(\n        ^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\sklearn\\utils\\validation.py\", line 971, in check_array\n    array = array.astype(new_dtype)\n            ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\generic.py\", line 6240, in astype\n    new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 448, in astype\n    return self.apply(\"astype\", dtype=dtype, copy=copy, errors=errors)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\managers.py\", line 352, in apply\n    applied = getattr(b, f)(**kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\internals\\blocks.py\", line 526, in astype\n    new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 299, in astype_array_safe\n    new_values = astype_array(values, dtype, copy=copy)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 230, in astype_array\n    values = astype_nansafe(values, dtype, copy=copy)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\linuxer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\pandas\\core\\dtypes\\astype.py\", line 170, in astype_nansafe\n    return arr.astype(dtype, copy=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: could not convert string to float: '73a8076a-fc45-47b8-b4f8-642b1585d8bc'\n"
+  },
+  "cdb3e3a6-b97": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_dc8d4bd6cffc.parquet",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 37,
+    "n_estimators": 500,
+    "error": "A task has failed to un-serialize. Please ensure that the arguments of the function are all picklable."
+  },
+  "d5672021-194": {
+    "phase": "Hyperparameter tuning...",
+    "progress": 30,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500
+  },
+  "c20f27ae-895": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500,
+    "train_time_seconds": 52.06,
+    "model_id": "rf_1773915417",
+    "metrics": {
+      "train": {
+        "accuracy": 0.7076992337815962,
+        "precision_macro": 0.601791502553441,
+        "recall_macro": 0.7218779131180215,
+        "f1_macro": 0.6413117501174879,
+        "f1_weighted": 0.6216574742513569,
+        "roc_auc": 0.8868028197490467,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            672358,
+            0,
+            24896,
+            12401
+          ],
+          [
+            9126,
+            0,
+            908569,
+            12501
+          ],
+          [
+            9287,
+            0,
+            908663,
+            12326
+          ],
+          [
+            9369,
+            0,
+            24782,
+            896421
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9603193646984889,
+            "recall": 0.9474434760552662,
+            "f1": 0.9538379693501537
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867203025319914,
+            "recall": 0.9767671099759642,
+            "f1": 0.6496979464361683
+          },
+          "csrf": {
+            "precision": 0.9601263429832839,
+            "recall": 0.9633010664408558,
+            "f1": 0.9617110846836292
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.7074211824301806,
+        "precision_macro": 0.6013972047891789,
+        "recall_macro": 0.7215847509122547,
+        "f1_macro": 0.6409911933168172,
+        "f1_weighted": 0.6213478627158994,
+        "roc_auc": 0.8865872374223271,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            143995,
+            0,
+            5271,
+            2803
+          ],
+          [
+            1929,
+            0,
+            194678,
+            2721
+          ],
+          [
+            1988,
+            0,
+            194662,
+            2695
+          ],
+          [
+            2105,
+            0,
+            5288,
+            192015
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9598578827732857,
+            "recall": 0.9469056809737685,
+            "f1": 0.9533377912250154
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867779114226342,
+            "recall": 0.976508063909303,
+            "f1": 0.6496919451842655
+          },
+          "csrf": {
+            "precision": 0.9589530249607958,
+            "recall": 0.9629252587659473,
+            "f1": 0.9609350368579879
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7073012064253816,
+        "precision_macro": 0.6016875494000895,
+        "recall_macro": 0.7214774022333568,
+        "f1_macro": 0.641019665384484,
+        "f1_weighted": 0.6213772962834263,
+        "roc_auc": 0.8864736739186581,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            144009,
+            0,
+            5462,
+            2598
+          ],
+          [
+            2030,
+            0,
+            194706,
+            2592
+          ],
+          [
+            1959,
+            0,
+            194716,
+            2670
+          ],
+          [
+            2044,
+            0,
+            5507,
+            191857
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9597912584476347,
+            "recall": 0.9469977444449559,
+            "f1": 0.9533515826964262
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.486314627451666,
+            "recall": 0.976778951064737,
+            "f1": 0.6493390425120387
+          },
+          "csrf": {
+            "precision": 0.960644311701057,
+            "recall": 0.9621329134237343,
+            "f1": 0.9613880363294707
+          }
+        }
+      },
+      "train_time_seconds": 52.05871796607971,
+      "feature_importance": {
+        "status_code": 0.39352989196777344,
+        "response_length": 0.43612781167030334,
+        "response_time": 0.1703423261642456,
+        "error_flag": 0.0,
+        "redirection_flag": 0.0
+      },
+      "model_path": "models\\rf_1773915417.joblib",
+      "preprocessor_path": "models\\rf_1773915417_preprocessor.joblib",
+      "model_id": "rf_1773915417",
+      "config": {
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 5,
+        "feature_mode": "payload_only",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "5253b7e3-f45": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_dc8d4bd6cffc.parquet",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 37,
+    "n_estimators": 500,
+    "train_time_seconds": 521.85,
+    "model_id": "rf_1773916329",
+    "metrics": {
+      "train": {
+        "accuracy": 0.960145959421247,
+        "precision_macro": 0.9601570679911346,
+        "recall_macro": 0.9593926577880549,
+        "f1_macro": 0.9597618973056297,
+        "f1_weighted": 0.9601352260852735,
+        "roc_auc": 0.9746008067383694,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            672358,
+            12428,
+            12468,
+            12401
+          ],
+          [
+            9125,
+            896090,
+            12480,
+            12501
+          ],
+          [
+            9286,
+            12352,
+            896312,
+            12326
+          ],
+          [
+            9368,
+            12355,
+            12427,
+            896422
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9603234795475742,
+            "recall": 0.9474434760552662,
+            "f1": 0.9538399990920646
+          },
+          "sqli": {
+            "precision": 0.9602078812719334,
+            "recall": 0.9633346090501357,
+            "f1": 0.961768703905344
+          },
+          "xss": {
+            "precision": 0.9599705254544617,
+            "recall": 0.9634904049980866,
+            "f1": 0.9617272445858636
+          },
+          "csrf": {
+            "precision": 0.9601263856905693,
+            "recall": 0.9633021410487314,
+            "f1": 0.9617116416392468
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9598613610611211,
+        "precision_macro": 0.9598614720512921,
+        "recall_macro": 0.9590930614298399,
+        "f1_macro": 0.9594641090771285,
+        "f1_weighted": 0.9598502711169519,
+        "roc_auc": 0.9729294238278563,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            143995,
+            2601,
+            2670,
+            2803
+          ],
+          [
+            1929,
+            192019,
+            2659,
+            2721
+          ],
+          [
+            1988,
+            2651,
+            192011,
+            2695
+          ],
+          [
+            2105,
+            2660,
+            2628,
+            192015
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9598578827732857,
+            "recall": 0.9469056809737685,
+            "f1": 0.9533377912250154
+          },
+          "sqli": {
+            "precision": 0.960426347089746,
+            "recall": 0.9633317948306309,
+            "f1": 0.9618768769144841
+          },
+          "xss": {
+            "precision": 0.960208633381341,
+            "recall": 0.963209511149013,
+            "f1": 0.9617067313110267
+          },
+          "csrf": {
+            "precision": 0.9589530249607958,
+            "recall": 0.9629252587659473,
+            "f1": 0.9609350368579879
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.9597747117243218,
+        "precision_macro": 0.9597766220926549,
+        "recall_macro": 0.9590166923400967,
+        "f1_macro": 0.9593833485381893,
+        "f1_weighted": 0.9597638233306922,
+        "roc_auc": 0.9726939161544044,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            144008,
+            2788,
+            2675,
+            2598
+          ],
+          [
+            2030,
+            192176,
+            2530,
+            2592
+          ],
+          [
+            1959,
+            2782,
+            191934,
+            2670
+          ],
+          [
+            2044,
+            2700,
+            2807,
+            191857
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9597909904626069,
+            "recall": 0.9469911684827282,
+            "f1": 0.9533481182350799
+          },
+          "sqli": {
+            "precision": 0.9587420053281183,
+            "recall": 0.9641194413228448,
+            "f1": 0.9614232041103223
+          },
+          "xss": {
+            "precision": 0.9599291808788373,
+            "recall": 0.9628232461310793,
+            "f1": 0.9613740354778846
+          },
+          "csrf": {
+            "precision": 0.960644311701057,
+            "recall": 0.9621329134237343,
+            "f1": 0.9613880363294707
+          }
+        }
+      },
+      "train_time_seconds": 521.847092628479,
+      "feature_importance": {
+        "has_select": 0.01714942418038845,
+        "has_union": 0.03322427719831467,
+        "has_sleep": 0.0012490832014009356,
+        "has_or_1_equals_1": 0.006706451065838337,
+        "has_drop": 0.0024788882583379745,
+        "has_insert": 6.824708543717861e-05,
+        "has_delete": 0.0035727708600461483,
+        "has_update": 0.00402211956679821,
+        "has_information_schema": 5.849150056747021e-06,
+        "has_where": 0.0035364567302167416,
+        "has_order_by": 0.0008303375798277557,
+        "has_group_by": 0.0006125547806732357,
+        "has_having": 0.000234793231356889,
+        "has_like": 0.009345842525362968,
+        "has_in": 0.00029486269340850413,
+        "has_hex": 0.03904780000448227,
+        "has_char": 0.09503387659788132,
+        "has_concat": 0.000746272795367986,
+        "has_ascii": 0.0,
+        "has_substring": 0.0008248787489719689,
+        "has_count": 1.0575575288385153e-05,
+        "has_benchmark": 0.00016438837337773293,
+        "has_waitfor": 0.007482742425054312,
+        "has_exec": 0.017646608874201775,
+        "has_xp_cmdshell": 0.050188444554805756,
+        "quote_count": 0.024079078808426857,
+        "comment_marker_count": 0.14381320774555206,
+        "semicolon_count": 0.011076007038354874,
+        "equals_count": 0.013150299899280071,
+        "parentheses_count": 0.16068007051944733,
+        "keyword_density": 0.004037616308778524,
+        "sqli_entropy": 0.005994981154799461,
+        "payload_length": 0.009710817597806454,
+        "special_char_ratio": 0.02479952946305275,
+        "encoded_char_ratio": 0.03134962543845177,
+        "logical_op_count": 0.18540197610855103,
+        "comparison_count": 0.09142927080392838
+      },
+      "model_path": "models\\rf_1773916329.joblib",
+      "preprocessor_path": "models\\rf_1773916329_preprocessor.joblib",
+      "model_id": "rf_1773916329",
+      "config": {
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 37,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
   }
 }

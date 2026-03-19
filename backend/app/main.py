@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 
 from .core.config import settings
 from .core.rate_limit import check_rate_limit
-from .api import auth, datasets, features, training, models, inference, experiments, reports, ids, robustness
+from .api import auth, datasets, features, training, models, inference, experiments, reports, ids, robustness, system
 
 logging.basicConfig(level=getattr(logging, settings.LOG_LEVEL, logging.INFO))
 logger = logging.getLogger("webguard")
@@ -75,6 +75,7 @@ app.include_router(experiments.router, prefix="/api/experiments", tags=["experim
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(ids.router, prefix="/api/ids", tags=["ids"])
 app.include_router(robustness.router, prefix="/api/robustness", tags=["robustness"])
+app.include_router(system.router, prefix="/api/system", tags=["system"])
 
 
 @app.get("/")

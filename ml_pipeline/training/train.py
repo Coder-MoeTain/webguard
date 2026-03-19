@@ -1,8 +1,8 @@
 """
-WebGuard RF - Random Forest Training Engine
+WebGuard RF - GPU Training Engine (XGBoost)
+Uses XGBoost with CUDA for GPU-accelerated tree ensemble training.
 """
 
-import json
 import time
 from pathlib import Path
 from typing import Optional, Dict, Any, Literal, Callable
@@ -10,8 +10,6 @@ from typing import Optional, Dict, Any, Literal, Callable
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import (
     accuracy_score,
     precision_recall_fscore_support,
@@ -23,8 +21,33 @@ from sklearn.metrics import (
 from .preprocessing import DataPreprocessor, LABEL_MAP_MULTICLASS, LABEL_MAP_BINARY
 
 
+def _get_xgb_model(classification_mode: str, n_estimators: int, max_depth: Optional[int],
+                   min_child_weight: int, colsample_bytree: float, random_state: int,
+                   scale_pos_weight: Optional[float] = None):
+    """Create XGBClassifier configured for GPU-only training."""
+    import xgboost as xgb
+    objective = "binary:logistic" if classification_mode == "binary" else "multi:softprob"
+    num_class = None if classification_mode == "binary" else 4
+    params = {
+        "n_estimators": n_estimators,
+        "max_depth": max_depth or 6,
+        "min_child_weight": min_child_weight,
+        "colsample_bytree": colsample_bytree,
+        "random_state": random_state,
+        "tree_method": "hist",
+        "device": "cuda",
+        "objective": objective,
+        "eval_metric": "mlogloss" if classification_mode == "multiclass" else "logloss",
+    }
+    if num_class:
+        params["num_class"] = num_class
+    if scale_pos_weight is not None:
+        params["scale_pos_weight"] = scale_pos_weight
+    return xgb.XGBClassifier(**params)
+
+
 class RandomForestTrainer:
-    """Train and save Random Forest models for web attack detection."""
+    """Train tree ensemble models for web attack detection using GPU (XGBoost + CUDA)."""
 
     def __init__(
         self,
@@ -37,7 +60,7 @@ class RandomForestTrainer:
         max_features: str = "sqrt",
         bootstrap: bool = True,
         random_state: int = 42,
-        n_jobs: int = -1,
+        n_jobs: int = 1,
         class_weight: Optional[str] = "balanced",
         hyperparameter_tuning: bool = False,
         progress_callback: Optional[Callable[[str, int], None]] = None,
@@ -80,7 +103,20 @@ class RandomForestTrainer:
         val_ratio: float = 0.15,
         test_ratio: float = 0.15,
     ) -> Dict[str, Any]:
-        """Train model and return metrics."""
+        """Train model on GPU and return metrics."""
+        import xgboost as xgb
+        try:
+            # Verify GPU is available
+            import subprocess
+            r = subprocess.run(["nvidia-smi"], capture_output=True, timeout=5)
+            if r.returncode != 0:
+                raise RuntimeError("NVIDIA GPU not detected. Training requires a CUDA-capable GPU.")
+        except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+            raise RuntimeError(
+                "NVIDIA GPU not detected. Training uses GPU only. "
+                "Install CUDA and ensure nvidia-smi works. Error: " + str(e)
+            ) from e
+
         self._log("Loading data...", 5, {"step": "load", "detail": "Reading dataset"})
         if data_path.endswith(".parquet"):
             df = pd.read_parquet(data_path)
@@ -103,51 +139,55 @@ class RandomForestTrainer:
         self.feature_columns_ = preprocessor.feature_columns_
         train_size, val_size, test_size = len(X_train), len(X_val), len(X_test)
 
-        class_weight = preprocessor.get_class_weights(y_train) if self.class_weight == "balanced" else None
+        n_features = len(self.feature_columns_)
+        colsample = 1.0 / (n_features ** 0.5) if self.max_features == "sqrt" else 1.0
+        min_child = max(1, self.min_samples_leaf)
+        scale_pos_weight = None
+        if self.class_weight == "balanced" and self.classification_mode == "binary":
+            n_pos = (y_train == 1).sum()
+            n_neg = (y_train == 0).sum()
+            if n_pos > 0:
+                scale_pos_weight = n_neg / n_pos
 
-        self._log("Training Random Forest...", 25, {
+        self._log("Training on GPU (XGBoost)...", 25, {
             "step": "training",
             "samples_loaded": total_samples,
             "train_size": train_size,
             "val_size": val_size,
             "test_size": test_size,
-            "feature_count": len(self.feature_columns_),
+            "feature_count": n_features,
             "n_estimators": self.n_estimators,
         })
         start = time.time()
-        params = {
-            "n_estimators": self.n_estimators,
-            "max_depth": self.max_depth,
-            "min_samples_split": self.min_samples_split,
-            "min_samples_leaf": self.min_samples_leaf,
-            "max_features": self.max_features,
-            "bootstrap": self.bootstrap,
-            "random_state": self.random_state,
-            "n_jobs": self.n_jobs,
-        }
-        if class_weight:
-            params["class_weight"] = class_weight
 
         if self.hyperparameter_tuning:
-            self._log("Hyperparameter tuning...", 30)
+            self._log("Hyperparameter tuning (GPU)...", 30)
+            from sklearn.model_selection import RandomizedSearchCV
+            base = _get_xgb_model(
+                self.classification_mode, 100, 20, min_child, colsample,
+                self.random_state, scale_pos_weight
+            )
             param_grid = {
                 "n_estimators": [100, 200, 300],
-                "max_depth": [20, 30, 40, None],
-                "min_samples_split": [2, 5],
-                "min_samples_leaf": [1, 2],
+                "max_depth": [20, 30, 40],
+                "min_child_weight": [1, 2, 5],
+                "colsample_bytree": [0.6, 0.8, 1.0],
             }
             search = RandomizedSearchCV(
-                RandomForestClassifier(random_state=self.random_state),
-                param_grid,
-                n_iter=10,
-                cv=3,
-                n_jobs=self.n_jobs,
-                random_state=self.random_state,
+                base, param_grid, n_iter=10, cv=3, random_state=self.random_state
             )
             search.fit(X_train, y_train)
             self.model_ = search.best_estimator_
         else:
-            self.model_ = RandomForestClassifier(**params)
+            self.model_ = _get_xgb_model(
+                self.classification_mode,
+                self.n_estimators,
+                self.max_depth,
+                min_child,
+                colsample,
+                self.random_state,
+                scale_pos_weight,
+            )
             self.model_.fit(X_train, y_train)
 
         train_time = time.time() - start
@@ -163,9 +203,12 @@ class RandomForestTrainer:
             metrics[split_name] = self._compute_metrics(y_s, pred, X_s)
 
         metrics["train_time_seconds"] = train_time
-        metrics["feature_importance"] = dict(
-            zip(self.feature_columns_, self.model_.feature_importances_.tolist())
-        )
+        imp = self.model_.feature_importances_
+        if hasattr(imp, "tolist"):
+            imp = imp.tolist()
+        else:
+            imp = list(imp)
+        metrics["feature_importance"] = dict(zip(self.feature_columns_, imp))
 
         self._log("Saving model...", 95)
         Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -198,8 +241,9 @@ class RandomForestTrainer:
         return metrics
 
     def _compute_metrics(self, y_true: np.ndarray, y_pred: np.ndarray, X: Optional[pd.DataFrame] = None) -> dict:
+        y_pred = np.asarray(y_pred).astype(int)
         acc = accuracy_score(y_true, y_pred)
-        prec, rec, f1, _ = precision_recall_fscore_support(y_true, y_pred, average=None)
+        prec, rec, f1, _ = precision_recall_fscore_support(y_true, y_pred, average=None, zero_division=0)
         prec_macro, rec_macro, f1_macro, _ = precision_recall_fscore_support(
             y_true, y_pred, average="macro", zero_division=0
         )
@@ -213,7 +257,7 @@ class RandomForestTrainer:
         fnr = fn / (fn + tp) if (fn + tp) > 0 else 0
 
         roc_auc = 0.0
-        if self.classification_mode == "binary" and len(np.unique(y_true)) > 1:
+        if self.classification_mode == "binary" and len(np.unique(y_true)) > 1 and X is not None:
             try:
                 proba = self.model_.predict_proba(X)[:, 1]
                 roc_auc = roc_auc_score(y_true, proba)

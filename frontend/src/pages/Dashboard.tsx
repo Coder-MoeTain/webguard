@@ -65,10 +65,15 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 style={{ margin: '0 0 1rem', fontSize: '1.75rem' }}>Dashboard</h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        WebGuard RF - Machine Learning driven detection of SQLi, XSS, and CSRF
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <img src="/shield.svg" alt="WebGuard RF" style={{ width: 56, height: 56 }} />
+        <div>
+          <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Dashboard</h1>
+          <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
+            Machine Learning driven detection of SQLi, XSS, and CSRF
+          </p>
+        </div>
+      </div>
 
       {/* Training Status & Model Accuracy Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>

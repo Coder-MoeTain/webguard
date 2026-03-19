@@ -126,27 +126,38 @@ export default function DatasetGeneration() {
           </button>
         </form>
         {result && (
-          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-primary)', borderRadius: 4 }}>
-            {result.job_id && <p style={{ margin: 0 }}>Job ID: {result.job_id}</p>}
-            {result.message && <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)' }}>{result.message}</p>}
+          <div style={{ marginTop: '1.5rem', padding: '1.5rem', background: 'var(--bg-primary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
+            {result.job_id && <p style={{ margin: 0, fontSize: '0.9rem' }}>Job ID: <strong>{result.job_id}</strong></p>}
+            {result.message && <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{result.message}</p>}
             {status && (
-              <div style={{ marginTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <span>{status.phase === 'completed' ? 'Completed' : status.phase === 'failed' ? 'Failed' : 'Generating'}</span>
-                  {status.written != null && status.total != null && (
-                    <span>{status.written.toLocaleString()} / {status.total.toLocaleString()} samples</span>
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: status.phase === 'completed' ? 'var(--success)' : status.phase === 'failed' ? 'var(--danger)' : 'var(--text)' }}>
+                    {status.phase === 'completed' ? '✓ Completed' : status.phase === 'failed' ? '✗ Failed' : '⏳ Generating...'}
+                  </span>
+                  {(status.written != null && status.total != null) && (
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                      {status.written.toLocaleString()} / {status.total.toLocaleString()} samples
+                    </span>
                   )}
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--accent)' }}>
+                    {status.progress ?? 0}%
+                  </span>
                 </div>
-                <div style={{ height: 8, background: 'var(--bg-card)', borderRadius: 4, overflow: 'hidden' }}>
+                <div style={{ height: 14, background: 'var(--bg-card)', borderRadius: 7, overflow: 'hidden' }}>
                   <div
                     style={{
                       height: '100%',
-                      width: `${status.progress ?? 0}%`,
+                      width: `${status.phase === 'starting' ? 5 : status.progress ?? 0}%`,
                       background: status.phase === 'completed' ? 'var(--success)' : status.phase === 'failed' ? 'var(--danger)' : 'var(--accent)',
-                      transition: 'width 0.3s ease',
+                      transition: 'width 0.4s ease',
+                      borderRadius: 7,
                     }}
                   />
                 </div>
+                {status.phase === 'starting' && (
+                  <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Initializing generation...</p>
+                )}
                 {status.phase === 'failed' && status.error && (
                   <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--danger)' }}>{status.error}</p>
                 )}

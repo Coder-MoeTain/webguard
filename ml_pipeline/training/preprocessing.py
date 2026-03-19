@@ -44,14 +44,43 @@ class DataPreprocessor:
         label_map = self._get_label_map()
         return y.map(label_map).values
 
+    # Columns to always exclude (identifiers, raw text - not usable as numeric features)
+    EXCLUDE_COLUMNS = frozenset({"id", "payload", "url", "headers", "content_type", "request_method", "endpoint_type"})
+
     def fit_transform(self, df: pd.DataFrame, label_col: str = "label") -> Tuple[pd.DataFrame, np.ndarray]:
-        """Preprocess and return X, y."""
-        self.feature_columns_ = [c for c in df.columns if c != label_col]
+        """Preprocess and return X, y. Only numeric columns are used as features."""
+        exclude = self.EXCLUDE_COLUMNS | {label_col}
+        candidates = [c for c in df.columns if c not in exclude]
+
+        # Keep only numeric columns (int, float, bool) - required for sklearn
+        numeric_cols = []
+        for c in candidates:
+            dtype = df[c].dtype
+            if np.issubdtype(dtype, np.number) or dtype == bool:
+                numeric_cols.append(c)
+            elif dtype == object:
+                # Skip object columns (strings like UUID, URLs) - they cannot be used as features
+                continue
+            else:
+                try:
+                    pd.to_numeric(df[c], errors="raise")
+                    numeric_cols.append(c)
+                except (ValueError, TypeError):
+                    pass
+
+        self.feature_columns_ = numeric_cols
+        if not self.feature_columns_:
+            raise ValueError(
+                "No numeric feature columns found. Use a feature-extracted dataset (with has_select, has_union, etc.) "
+                "or run Feature Extraction on your raw dataset first."
+            )
         X = df[self.feature_columns_].copy()
         y = df[label_col]
 
         X = X.fillna(0)
         X = X.replace([np.inf, -np.inf], 0)
+        # Ensure all columns are numeric (convert bool to int)
+        X = X.astype(np.float64)
         y_encoded = self._encode_labels(y)
         return X, y_encoded
 

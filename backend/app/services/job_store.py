@@ -52,13 +52,25 @@ def get_job(job_id: str) -> dict | None:
             if db:
                 row = db.query(TrainingJob).filter(TrainingJob.job_id == job_id).first()
                 if row:
+                    config = {
+                        "classification_mode": row.classification_mode,
+                        "feature_mode": row.feature_mode,
+                        "train_ratio": row.train_ratio,
+                        "val_ratio": row.val_ratio,
+                        "test_ratio": row.test_ratio,
+                        "n_estimators": row.n_estimators,
+                        "max_depth": row.max_depth,
+                        "hyperparameter_tuning": row.hyperparameter_tuning,
+                    }
                     return {
                         "job_id": row.job_id,
                         "phase": row.current_phase or row.status,
                         "progress": row.progress_percent,
+                        "step": row.current_phase,
                         "metrics": row.metrics_json,
                         "error": row.error_message,
-                        **{k: v for k, v in (row.metrics_json or {}).items() if k in ("samples_loaded", "train_size", "val_size", "test_size", "feature_count", "config")},
+                        "config": config,
+                        **{k: v for k, v in (row.metrics_json or {}).items() if k in ("samples_loaded", "train_size", "val_size", "test_size", "feature_count")},
                     }
     return _file_get(job_id)
 
@@ -67,7 +79,10 @@ def set_job(job_id: str, status: dict[str, Any], config: dict | None = None) -> 
     from ..db import get_db, db_available
     from ..db.models import TrainingJob
     from datetime import datetime
-    _file_set(job_id, status)
+    to_store = {**status}
+    if config is not None:
+        to_store["config"] = config
+    _file_set(job_id, to_store)
     if db_available():
         with get_db() as db:
             if db:

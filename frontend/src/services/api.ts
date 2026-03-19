@@ -64,7 +64,8 @@ export const training = {
 }
 
 export const models = {
-  list: () => api.get('/models/'),
+  list: (params?: { include_metrics?: boolean }) =>
+    api.get('/models/', { params: params?.include_metrics ? { include_metrics: 1 } : undefined }),
   detail: (modelId: string) => api.get(`/models/${modelId}`),
   download: (modelId: string) => api.get(`/models/${modelId}/download`, { responseType: 'blob' }),
   reset: () => api.post('/models/reset'),
@@ -93,4 +94,8 @@ export const ids = {
 export const robustness = {
   analyze: (config: { model_id?: string; data_path: string; test_type?: 'zero_out' | 'ablation'; top_n?: number }) =>
     api.post('/robustness/analyze', config),
+}
+
+export const system = {
+  metrics: () => api.get('/system/metrics'),
 }

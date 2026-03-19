@@ -36,12 +36,17 @@ export default function Layout() {
         padding: '1rem 0',
         borderRight: '1px solid var(--bg-card)',
       }}>
-        <div style={{ padding: '0 1rem 1rem', borderBottom: '1px solid var(--bg-card)' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--accent)' }}>WebGuard RF</h2>
-          <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Attack Detection
-          </p>
-        </div>
+        <Link to="/" style={{ display: 'block', padding: '0 1rem 1rem', borderBottom: '1px solid var(--bg-card)', textDecoration: 'none', color: 'inherit' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <img src="/shield.svg" alt="WebGuard RF" style={{ width: 36, height: 36 }} />
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--accent)' }}>WebGuard RF</h2>
+              <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Attack Detection
+              </p>
+            </div>
+          </div>
+        </Link>
         <nav style={{ padding: '1rem 0' }}>
           {navItems.map(({ path, label, icon: Icon }) => (
             <Link

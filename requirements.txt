@@ -11,6 +11,7 @@ alembic==1.13.1
 
 # ML & Data
 scikit-learn==1.4.0
+xgboost>=2.0.0
 pandas==2.2.0
 numpy==1.26.3
 pyarrow==15.0.0
@@ -43,6 +44,9 @@ structlog==24.1.0
 
 # Progress
 tqdm==4.66.1
+
+# System metrics
+psutil==5.9.8
 
 # Testing
 pytest==8.0.0

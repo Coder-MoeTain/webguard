@@ -2,7 +2,8 @@
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn" />
+  <img src="https://img.shields.io/badge/XGBoost-02569B?style=for-the-badge&logo=xgboost&logoColor=white" alt="XGBoost" />
+  <img src="https://img.shields.io/badge/CUDA-76B900?style=for-the-badge&logo=nvidia&logoColor=white" alt="CUDA" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
 </p>
 
@@ -15,7 +16,7 @@
   <strong>Machine Learning Driven Detection of SQLi, XSS, and CSRF</strong>
 </p>
 <p align="center">
-  A production-style research framework for detecting web application attacks using Random Forest classification.
+  A production-style research framework for detecting web application attacks using tree ensemble models (XGBoost GPU) with Random Forest–style inference.
 </p>
 
 <p align="center">
@@ -27,6 +28,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Latest Features](#latest-features)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Architecture](#architecture)
@@ -43,7 +45,19 @@
 
 ## Overview
 
-WebGuard RF is an end-to-end ML-based web attack detection system for academic cybersecurity research and practical deployment. It generates or ingests up to 5 million samples, extracts security-relevant features, trains Random Forest models, and provides a modern web dashboard for experiment management and live payload testing.
+WebGuard RF is an end-to-end ML-based web attack detection system for academic cybersecurity research and practical deployment. It generates or ingests up to 5 million samples, extracts security-relevant features, trains tree ensemble models on GPU (XGBoost + CUDA), and provides a modern web dashboard for experiment management and live payload testing.
+
+---
+
+## Latest Features
+
+| Feature | Description |
+|---------|-------------|
+| **GPU-only training** | XGBoost with CUDA (`device='cuda'`, `tree_method='hist'`) for fast training; inference runs on CPU for deployment flexibility |
+| **Model Evaluation** | Table of all models with test accuracy, F1 macro, precision, recall, train time; click a row to expand full train/validation/test metrics |
+| **Training Monitor** | Real-time progress chart, system metrics (CPU, memory, GPU via `nvidia-smi`), config cards, and result charts |
+| **Feature Importance** | Model selector, top-N selector, bar/pie/table views, metadata cards, download button |
+| **Models API with metrics** | `GET /api/models/?include_metrics=1` returns models enriched with accuracy and metrics from completed jobs |
 
 ---
 
@@ -78,12 +92,16 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 
 | Feature | Description |
 |---------|-------------|
-| **Real-time IDS** | Live intrusion detection dashboard with Random Forest model |
+| **GPU Training** | XGBoost with CUDA for GPU-accelerated tree ensemble training |
+| **Model Evaluation** | Table view of models with test accuracy, F1, precision, recall; expandable detail panel for train/validation/test metrics |
+| **Real-time IDS** | Live intrusion detection dashboard with Random Forest–style model |
 | **Multi-class & Binary** | SQLi, XSS, CSRF, Benign (or Attack vs Benign) |
 | **5M Sample Dataset** | 80% attack, 20% benign with configurable sub-distribution |
 | **Rich Feature Engineering** | Lexical, structural, behavioral, contextual features |
 | **Payload-Only & Hybrid** | Detect from payload alone or payload + response behavior |
 | **Research-Grade Metrics** | Confusion matrix, ROC-AUC, per-class metrics, feature importance |
+| **Feature Importance** | Bar, pie, and table views; model selector; top-N features; download |
+| **Training Monitor** | Live progress chart, system metrics (CPU, memory, GPU), config cards, result charts |
 | **Robustness Analysis** | Feature ablation, zero-out sensitivity, OOD testing |
 | **Live Inference** | Test payloads with confidence scores and explanations |
 
@@ -106,7 +124,7 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 │         │                    │                    │                           │
 │         ▼                    ▼                    ▼                           │
 │  ┌─────────────┐    ┌──────────────┐    ┌─────────────────┐                    │
-│  │  CSV/Parquet│    │  Tabular     │    │  Random Forest  │                    │
+│  │  CSV/Parquet│    │  Tabular     │    │  XGBoost (GPU)  │                    │
 │  │  Storage    │    │  Features    │    │  Training      │                    │
 │  └─────────────┘    └──────────────┘    └────────┬────────┘                    │
 │                                                   │                           │
@@ -127,6 +145,7 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 
 - **Python** 3.10+
 - **Node.js** 18+
+- **NVIDIA GPU + CUDA** (for training; inference runs on CPU)
 - **MySQL** 8.0+ or PostgreSQL 14+ (optional)
 - **Redis** (optional, for Celery)
 
@@ -227,7 +246,8 @@ webguard-rf/
 | POST | `/api/features/extract` | Extract features from dataset |
 | POST | `/api/training/start` | Start training job |
 | GET | `/api/training/{job_id}/status` | Get training status |
-| GET | `/api/models/` | List trained models |
+| GET | `/api/models/` | List trained models (`?include_metrics=1` for accuracy, F1, etc.) |
+| GET | `/api/system/metrics` | CPU, memory, GPU metrics |
 | POST | `/api/inference/predict` | Live payload prediction |
 | POST | `/api/ids/analyze` | IDS: Analyze request |
 | GET | `/api/ids/alerts` | IDS: List alerts |
@@ -246,9 +266,11 @@ webguard-rf/
 | **Dataset Upload** | Upload CSV/Parquet |
 | **Dataset Browser** | Browse, preview, manage datasets |
 | **Feature Extraction** | Extract features (payload-only, hybrid, etc.) |
-| **Training Config** | Set RF params, start training |
-| **Training Monitor** | Live training progress |
+| **Training Config** | Set RF params, start GPU training |
+| **Training Monitor** | Live progress chart, system metrics (CPU/memory/GPU) |
+| **Model Evaluation** | Table of models with accuracy, F1, precision, recall; expandable metrics detail |
 | **Inference Testing** | Live payload testing |
+| **Feature Importance** | Bar/pie/table views, top-N features, model download |
 | **Model Management** | List, download models |
 | **Robustness Analysis** | Feature ablation, sensitivity |
 | **IDS Dashboard** | Real-time intrusion detection |

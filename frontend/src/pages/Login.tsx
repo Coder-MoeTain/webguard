@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Shield } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { auth } from '../services/api'
 
@@ -43,7 +42,7 @@ export default function Login() {
         border: '1px solid var(--bg-card)',
       }}>
         <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-          <Shield size={48} style={{ color: 'var(--accent)' }} />
+          <img src="/shield.svg" alt="WebGuard RF" style={{ width: 64, height: 64, marginBottom: '0.5rem' }} />
           <h1 style={{ margin: '0.5rem 0', fontSize: '1.5rem' }}>WebGuard RF</h1>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             Web Attack Detection Platform

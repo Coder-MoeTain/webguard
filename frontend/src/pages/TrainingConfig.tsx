@@ -156,6 +156,9 @@ export default function TrainingConfig() {
                   No datasets yet. <Link to="/datasets/browse" style={{ color: 'var(--accent)' }}>Generate or upload</Link> a dataset first.
                 </p>
               )}
+              <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Use a feature-extracted dataset for best results. <Link to="/features/extract" style={{ color: 'var(--accent)' }}>Extract features</Link> from raw data first.
+              </p>
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.25rem' }}>Classification Mode</label>

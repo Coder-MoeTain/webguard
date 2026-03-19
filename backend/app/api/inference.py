@@ -75,7 +75,14 @@ def predict(req: InferenceRequest, user: dict = Depends(get_current_user)):
         raise HTTPException(400, f"Model {model_id} not found. Train a model first.")
 
     if model_id not in _model_cache:
-        _model_cache[model_id] = (joblib.load(model_path), joblib.load(prep_path))
+        model = joblib.load(model_path)
+        # XGBoost GPU models: use CPU for inference (allows inference on CPU-only servers)
+        if hasattr(model, "set_params"):
+            try:
+                model.set_params(device="cpu")
+            except Exception:
+                pass
+        _model_cache[model_id] = (model, joblib.load(prep_path))
 
     model, prep_data = _model_cache[model_id]
     preprocessor = prep_data["preprocessor"]
@@ -96,12 +103,18 @@ def predict(req: InferenceRequest, user: dict = Depends(get_current_user)):
             df[c] = 0
     df = df[feature_columns].fillna(0)
 
-    pred = model.predict(df)[0]
+    pred_raw = model.predict(df)
+    pred = int(pred_raw[0]) if hasattr(pred_raw, "__getitem__") else int(pred_raw)
     proba = model.predict_proba(df)[0]
     conf = float(max(proba))
     pred_label = label_map_inv.get(int(pred), "unknown")
 
-    importances = dict(zip(feature_columns, model.feature_importances_))
+    imp = model.feature_importances_
+    if hasattr(imp, "tolist"):
+        imp = imp.tolist()
+    else:
+        imp = list(imp)
+    importances = dict(zip(feature_columns, imp))
     top = sorted(importances.items(), key=lambda x: -x[1])[:5]
     top_features = [{"name": k, "importance": float(v)} for k, v in top]
 
