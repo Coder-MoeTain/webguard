@@ -21,34 +21,38 @@ router = APIRouter()
 _model_cache = {}
 
 
-def _load_model():
-    """Load or get cached model."""
+def _load_model(model_id: Optional[str] = None):
+    """Load or get cached model. model_id=None uses latest."""
     global _model_cache
-    if "model" in _model_cache:
-        return _model_cache["model"]
+    models_dir = Path(settings.MODELS_DIR)
+    if model_id:
+        cache_key = model_id
+    else:
+        joblibs = list(models_dir.glob("rf_*.joblib"))
+        joblibs = [f for f in joblibs if "_preprocessor" not in f.name]
+        if not joblibs:
+            return None
+        model_id = joblibs[-1].stem
+        cache_key = model_id
+
+    if cache_key in _model_cache:
+        return _model_cache[cache_key]
 
     project_root = Path(__file__).resolve().parents[3]
     sys.path.insert(0, str(project_root))
     from ml_pipeline.feature_extraction import FeatureExtractor
 
-    models_dir = Path(settings.MODELS_DIR)
-    joblibs = list(models_dir.glob("rf_*.joblib"))
-    joblibs = [f for f in joblibs if "_preprocessor" not in f.name]
-    if not joblibs:
-        return None
-
-    model_id = joblibs[-1].stem
     model_path = models_dir / f"{model_id}.joblib"
     prep_path = models_dir / f"{model_id}_preprocessor.joblib"
-    if not model_path.exists():
+    if not model_path.exists() or not prep_path.exists():
         return None
 
     model = joblib.load(model_path)
     prep_data = joblib.load(prep_path)
     ext = FeatureExtractor(feature_mode=prep_data.get("feature_mode", "payload_only"))
 
-    _model_cache["model"] = (model, prep_data, ext)
-    return _model_cache["model"]
+    _model_cache[cache_key] = (model, prep_data, ext)
+    return _model_cache[cache_key]
 
 
 class AnalyzeRequest(BaseModel):
@@ -57,12 +61,13 @@ class AnalyzeRequest(BaseModel):
     body: Optional[str] = None
     query_params: Optional[str] = None
     headers: Optional[Dict[str, str]] = None
+    model_id: Optional[str] = None
 
 
 @router.post("/analyze")
 def analyze_request(req: AnalyzeRequest, request: Request, user: dict = Depends(get_current_user)):
     """Analyze a single request - IDS core detection."""
-    loaded = _load_model()
+    loaded = _load_model(req.model_id)
     if not loaded:
         raise HTTPException(503, "No trained model. Train a model first.")
 
@@ -96,12 +101,23 @@ def analyze_request(req: AnalyzeRequest, request: Request, user: dict = Depends(
             df[c] = 0
     df = df[feature_columns].fillna(0)
 
-    pred = model.predict(df)[0]
+    pred_raw = model.predict(df)
+    pred = int(pred_raw[0]) if hasattr(pred_raw, "__getitem__") else int(pred_raw)
     proba = model.predict_proba(df)[0]
     conf = float(max(proba))
     pred_label = label_map_inv.get(int(pred), "unknown")
 
-    importances = dict(zip(feature_columns, model.feature_importances_))
+    if hasattr(model, "feature_importances_"):
+        imp = model.feature_importances_
+        imp = imp.tolist() if hasattr(imp, "tolist") else list(imp)
+    elif hasattr(model, "coef_"):
+        import numpy as np
+        coef = np.asarray(model.coef_)
+        imp = np.abs(coef).mean(axis=0) if coef.ndim > 1 else np.abs(coef)
+        imp = (imp / (imp.sum() + 1e-10)).tolist()
+    else:
+        imp = [1.0 / len(feature_columns)] * len(feature_columns)
+    importances = dict(zip(feature_columns, imp))
     top = sorted(importances.items(), key=lambda x: -x[1])[:5]
     top_indicators = [k for k, _ in top]
 

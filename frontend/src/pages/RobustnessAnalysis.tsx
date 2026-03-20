@@ -21,18 +21,21 @@ type AblationResult = {
 type RobustnessResult = ZeroOutResult | AblationResult
 
 export default function RobustnessAnalysis() {
-  const [modelList, setModelList] = useState<{ id: string }[]>([])
+  const [modelList, setModelList] = useState<{ id: string; algorithm_label?: string }[]>([])
   const [datasetList, setDatasetList] = useState<{ path: string; name: string }[]>([])
   const [modelId, setModelId] = useState('')
   const [dataPath, setDataPath] = useState('data/sample_sqli_37_features.parquet')
   const [testType, setTestType] = useState<'zero_out' | 'ablation'>('zero_out')
   const [topN, setTopN] = useState(10)
   const [result, setResult] = useState<RobustnessResult | null>(null)
+  const [compareModelIds, setCompareModelIds] = useState<string[]>([])
+  const [compareResults, setCompareResults] = useState<RobustnessResult[]>([])
+  const [compareLoading, setCompareLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    models.list().then(({ data }) => setModelList(data.models || [])).catch(() => [])
+    models.list({ include_metrics: true }).then(({ data }) => setModelList(data.models || [])).catch(() => [])
     datasets.list().then(({ data }) => setDatasetList(data.datasets || [])).catch(() => [])
   }, [])
 
@@ -73,6 +76,25 @@ export default function RobustnessAnalysis() {
 
   const chartData = testType === 'zero_out' ? chartDataZeroOut : chartDataAblation
 
+  const runCompare = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (compareModelIds.length < 2) return
+    setCompareLoading(true)
+    setCompareResults([])
+    try {
+      const results = await Promise.all(
+        compareModelIds.map((mid) =>
+          robustness.analyze({ model_id: mid, data_path: dataPath, test_type: testType, top_n: topN }).then((r) => r.data)
+        )
+      )
+      setCompareResults(results)
+    } catch {
+      setCompareResults([])
+    } finally {
+      setCompareLoading(false)
+    }
+  }
+
   return (
     <div>
       <h1 style={{ margin: '0 0 1rem' }}>Robustness Analysis</h1>
@@ -91,7 +113,7 @@ export default function RobustnessAnalysis() {
             >
               <option value="">Latest model</option>
               {modelList.map((m) => (
-                <option key={m.id} value={m.id}>{m.id}</option>
+                <option key={m.id} value={m.id}>{m.algorithm_label ? `${m.algorithm_label} — ${m.id}` : m.id}</option>
               ))}
             </select>
           </div>
@@ -134,9 +156,31 @@ export default function RobustnessAnalysis() {
             </div>
           )}
         </div>
-        <button type="submit" disabled={loading} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', border: 'none', borderRadius: 4, color: 'var(--bg-primary)', fontWeight: 600 }}>
-          {loading ? 'Analyzing...' : 'Run Analysis'}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button type="submit" disabled={loading} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', border: 'none', borderRadius: 4, color: 'var(--bg-primary)', fontWeight: 600 }}>
+            {loading ? 'Analyzing...' : 'Run Analysis'}
+          </button>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Compare models (select 2+):</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', maxWidth: 400 }}>
+                {modelList.map((m) => (
+                  <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={compareModelIds.includes(m.id)}
+                      onChange={(e) => setCompareModelIds((prev) => (e.target.checked ? [...prev, m.id] : prev.filter((id) => id !== m.id)))}
+                    />
+                    {m.algorithm_label ? `${m.algorithm_label} (${m.id.slice(-6)})` : m.id}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <button type="button" onClick={runCompare} disabled={compareModelIds.length < 2 || compareLoading} style={{ padding: '0.5rem 1rem', background: 'var(--bg-card)', border: '1px solid var(--bg-card)', borderRadius: 4, color: 'var(--text)', cursor: compareModelIds.length < 2 || compareLoading ? 'not-allowed' : 'pointer', alignSelf: 'flex-end' }}>
+              {compareLoading ? 'Running...' : 'Compare'}
+            </button>
+          </div>
+        </div>
       </form>
 
       {error && (
@@ -148,6 +192,10 @@ export default function RobustnessAnalysis() {
       {result && (
         <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
           <h3 style={{ margin: '0 0 1rem' }}>Results — {result.model_id}</h3>
+          {(() => {
+            const m = modelList.find((x) => x.id === result.model_id)
+            return m?.algorithm_label ? <p style={{ margin: '0 0 1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Algorithm: {m.algorithm_label}</p> : null
+          })()}
           <div style={{ marginBottom: '1rem', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
             <div>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Baseline accuracy</span>
@@ -192,6 +240,39 @@ export default function RobustnessAnalysis() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {compareResults.length > 0 && (
+        <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)', marginTop: '1.5rem' }}>
+          <h3 style={{ margin: '0 0 1rem' }}>Model Comparison</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--bg-card)' }}>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>Model (Algorithm)</th>
+                  <th style={{ textAlign: 'right', padding: '0.5rem' }}>Baseline Accuracy</th>
+                  {compareResults[0]?.test_type === 'ablation' && Object.keys((compareResults[0] as AblationResult).group_accuracies || {}).map((g) => (
+                    <th key={g} style={{ textAlign: 'right', padding: '0.5rem' }}>{g}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {compareResults.map((r) => {
+                  const m = modelList.find((x) => x.id === r.model_id)
+                  return (
+                    <tr key={r.model_id} style={{ borderBottom: '1px solid var(--bg-card)' }}>
+                      <td style={{ padding: '0.5rem' }}>{m?.algorithm_label ? `${m.algorithm_label} (${r.model_id})` : r.model_id}</td>
+                      <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 600 }}>{(r.baseline_accuracy * 100).toFixed(2)}%</td>
+                      {r.test_type === 'ablation' && Object.values((r as AblationResult).group_accuracies || {}).map((acc, j) => (
+                        <td key={j} style={{ padding: '0.5rem', textAlign: 'right' }}>{(acc * 100).toFixed(2)}%</td>
+                      ))}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

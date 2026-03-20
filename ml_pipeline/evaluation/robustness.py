@@ -8,6 +8,21 @@ import numpy as np
 import pandas as pd
 
 
+def _get_feature_importances(model, feature_columns: List[str]) -> Dict[str, float]:
+    """Get feature importances for any model type."""
+    if hasattr(model, "feature_importances_"):
+        imp = model.feature_importances_
+        imp = imp.tolist() if hasattr(imp, "tolist") else list(imp)
+        return dict(zip(feature_columns, imp))
+    if hasattr(model, "coef_"):
+        coef = np.asarray(model.coef_)
+        imp = np.abs(coef).mean(axis=0) if coef.ndim > 1 else np.abs(coef)
+        imp = imp / (imp.sum() + 1e-10)
+        return dict(zip(feature_columns, imp.tolist()))
+    n = len(feature_columns)
+    return {f: 1.0 / n for f in feature_columns}
+
+
 class RobustnessTester:
     """Test model robustness via feature ablation and test suites."""
 
@@ -24,7 +39,7 @@ class RobustnessTester:
     ) -> Dict[str, float]:
         """Zero out each of top-N important features and measure accuracy drop."""
         base_acc = (self.model.predict(X) == y).mean()
-        importances = dict(zip(self.feature_columns, self.model.feature_importances_))
+        importances = _get_feature_importances(self.model, self.feature_columns)
         sorted_features = sorted(importances.keys(), key=lambda f: importances[f], reverse=True)[:top_n]
         results = {}
         for feat in sorted_features:

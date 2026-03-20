@@ -23,6 +23,7 @@ Path(settings.MODELS_DIR).mkdir(parents=True, exist_ok=True)
 
 class TrainingConfig(BaseModel):
     data_path: str
+    algorithm: Literal["xgboost", "random_forest", "logistic_regression", "svm", "lightgbm", "catboost"] = "xgboost"
     classification_mode: Literal["binary", "multiclass"] = "multiclass"
     feature_mode: Literal["payload_only", "response_only", "hybrid", "sqli_37"] = "payload_only"
     train_ratio: float = 0.70
@@ -67,6 +68,7 @@ def run_training(job_id: str, config: dict):
 
     set_job(job_id, {"phase": "starting", "progress": 0, "step": "init"}, config=config)
     trainer = RandomForestTrainer(
+        algorithm=config.get("algorithm", "xgboost"),
         classification_mode=config["classification_mode"],
         feature_mode=config.get("feature_mode", "payload_only"),
         n_estimators=config["n_estimators"],

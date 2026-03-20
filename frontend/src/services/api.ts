@@ -84,7 +84,7 @@ export const reports = {
 }
 
 export const ids = {
-  analyze: (data: { method?: string; url?: string; body?: string; query_params?: string }) =>
+  analyze: (data: { method?: string; url?: string; body?: string; query_params?: string; model_id?: string }) =>
     api.post('/ids/analyze', data),
   alerts: (params?: { limit?: number; since?: number }) => api.get('/ids/alerts', { params }),
   stats: () => api.get('/ids/stats'),

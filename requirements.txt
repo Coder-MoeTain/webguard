@@ -12,6 +12,8 @@ alembic==1.13.1
 # ML & Data
 scikit-learn==1.4.0
 xgboost>=2.0.0
+lightgbm>=4.0.0
+catboost>=1.2.0
 pandas==2.2.0
 numpy==1.26.3
 pyarrow==15.0.0

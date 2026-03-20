@@ -109,11 +109,16 @@ def predict(req: InferenceRequest, user: dict = Depends(get_current_user)):
     conf = float(max(proba))
     pred_label = label_map_inv.get(int(pred), "unknown")
 
-    imp = model.feature_importances_
-    if hasattr(imp, "tolist"):
-        imp = imp.tolist()
+    if hasattr(model, "feature_importances_"):
+        imp = model.feature_importances_
+        imp = imp.tolist() if hasattr(imp, "tolist") else list(imp)
+    elif hasattr(model, "coef_"):
+        import numpy as np
+        coef = np.asarray(model.coef_)
+        imp = np.abs(coef).mean(axis=0) if coef.ndim > 1 else np.abs(coef)
+        imp = (imp / (imp.sum() + 1e-10)).tolist()
     else:
-        imp = list(imp)
+        imp = [1.0 / len(feature_columns)] * len(feature_columns)
     importances = dict(zip(feature_columns, imp))
     top = sorted(importances.items(), key=lambda x: -x[1])[:5]
     top_features = [{"name": k, "importance": float(v)} for k, v in top]

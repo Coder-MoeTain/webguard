@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { models } from '../services/api'
 import { BarChart3, Cpu, ChevronDown, ChevronRight } from 'lucide-react'
 
@@ -7,6 +8,8 @@ type ModelWithMetrics = {
   id: string
   name: string
   path?: string
+  algorithm?: string | null
+  algorithm_label?: string | null
   test_accuracy?: number | null
   test_f1_macro?: number | null
   test_precision_macro?: number | null
@@ -90,6 +93,7 @@ export default function ModelEvaluation() {
   const [modelList, setModelList] = useState<ModelWithMetrics[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     setLoading(true)
@@ -101,6 +105,22 @@ export default function ModelEvaluation() {
   }, [])
 
   const selected = modelList.find((m) => m.id === selectedId)
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+  const compareModels = modelList.filter((m) => compareIds.has(m.id))
+  const compareChartData = compareModels.map((m) => ({
+    name: `${m.algorithm_label || m.id} (${m.id.slice(-6)})`,
+    accuracy: (m.test_accuracy ?? 0) * 100,
+    f1: (m.test_f1_macro ?? 0) * 100,
+    precision: (m.test_precision_macro ?? 0) * 100,
+    recall: (m.test_recall_macro ?? 0) * 100,
+  }))
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -140,11 +160,13 @@ export default function ModelEvaluation() {
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--bg-card)' }}>
                   <th style={{ textAlign: 'left', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Model</th>
+                  <th style={{ textAlign: 'left', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Algorithm</th>
                   <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Test Accuracy</th>
                   <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>F1 Macro</th>
                   <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Precision</th>
                   <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Recall</th>
                   <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Train Time</th>
+                  <th style={{ width: 80, padding: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>Compare</th>
                   <th style={{ width: 40, padding: '0.75rem' }} />
                 </tr>
               </thead>
@@ -161,6 +183,7 @@ export default function ModelEvaluation() {
                       }}
                     >
                       <td style={{ padding: '0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{m.id}</td>
+                      <td style={{ padding: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>{m.algorithm_label || m.algorithm || '—'}</td>
                       <td style={{ padding: '0.75rem', textAlign: 'right', fontWeight: 600 }}>{fmt(m.test_accuracy)}</td>
                       <td style={{ padding: '0.75rem', textAlign: 'right' }}>{fmt(m.test_f1_macro)}</td>
                       <td style={{ padding: '0.75rem', textAlign: 'right' }}>{fmt(m.test_precision_macro)}</td>
@@ -168,13 +191,30 @@ export default function ModelEvaluation() {
                       <td style={{ padding: '0.75rem', textAlign: 'right', color: 'var(--text-muted)' }}>
                         {m.train_time_seconds != null ? `${m.train_time_seconds.toFixed(1)}s` : '—'}
                       </td>
+                      <td style={{ padding: '0.75rem' }} onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => toggleCompare(m.id)}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
+                            background: compareIds.has(m.id) ? 'var(--accent)' : 'var(--bg-primary)',
+                            color: compareIds.has(m.id) ? 'var(--bg-primary)' : 'var(--text)',
+                            border: '1px solid var(--bg-card)',
+                            borderRadius: 4,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {compareIds.has(m.id) ? '✓ Compare' : 'Compare'}
+                        </button>
+                      </td>
                       <td style={{ padding: '0.75rem' }}>
                         {selectedId === m.id ? <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} /> : <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />}
                       </td>
                     </tr>
                     {selectedId === m.id && selected && (
                       <tr key={`${m.id}-detail`}>
-                        <td colSpan={7} style={{ padding: 0, borderBottom: '1px solid var(--bg-card)', verticalAlign: 'top' }}>
+                        <td colSpan={9} style={{ padding: 0, borderBottom: '1px solid var(--bg-card)', verticalAlign: 'top' }}>
                           <ModelDetailPanel metrics={selected.metrics} />
                         </td>
                       </tr>
@@ -183,6 +223,27 @@ export default function ModelEvaluation() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Compare models chart */}
+      {!loading && compareModels.length > 0 && (
+        <div style={{ ...cardStyle, marginTop: '1.5rem' }}>
+          <h3 style={{ margin: '0 0 1rem', fontSize: '1rem' }}>Model Comparison</h3>
+          <div style={{ height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={compareChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <XAxis dataKey="name" stroke="var(--text-muted)" tick={{ fill: 'var(--text)', fontSize: 11 }} />
+                <YAxis stroke="var(--text-muted)" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} tickFormatter={(v) => `${v}%`} />
+                <Tooltip formatter={(v: number) => `${v.toFixed(2)}%`} contentStyle={{ background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 8 }} />
+                <Legend />
+                <Bar dataKey="accuracy" fill="var(--accent)" name="Accuracy" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="f1" fill="#22c55e" name="F1 Macro" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="precision" fill="#f59e0b" name="Precision" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="recall" fill="#8b5cf6" name="Recall" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}

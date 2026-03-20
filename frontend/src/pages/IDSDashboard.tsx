@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Shield, AlertTriangle, Activity, BarChart3, Play, Square, Trash2 } from 'lucide-react'
-import { ids } from '../services/api'
+import { ids, models } from '../services/api'
 
 interface Alert {
   id: string
@@ -34,12 +34,18 @@ const TRAFFIC_SAMPLES = [
 ]
 
 export default function IDSDashboard() {
+  const [modelList, setModelList] = useState<{ id: string; algorithm_label?: string }[]>([])
+  const [modelId, setModelId] = useState('')
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [testPayload, setTestPayload] = useState("' OR 1=1--")
   const [lastResult, setLastResult] = useState<{ prediction: string; confidence: number; alert_raised: boolean } | null>(null)
   const [simulatorRunning, setSimulatorRunning] = useState(false)
   const simulatorRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    models.list({ include_metrics: true }).then(({ data }) => setModelList(data.models || [])).catch(() => [])
+  }, [])
 
   const fetchData = async () => {
     try {
@@ -67,6 +73,7 @@ export default function IDSDashboard() {
         method: 'GET',
         url: '/search',
         query_params: testPayload,
+        model_id: modelId || undefined,
       })
       setLastResult({
         prediction: data.prediction,
@@ -89,6 +96,7 @@ export default function IDSDashboard() {
           method: 'GET',
           url: '/search',
           query_params: sample.payload,
+          model_id: modelId || undefined,
         })
         fetchData()
       } catch {}
@@ -117,8 +125,31 @@ export default function IDSDashboard() {
     <div>
       <h1 style={{ margin: '0 0 1rem', fontSize: '1.75rem' }}>Real-time IDS Dashboard</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        WebGuard RF Intrusion Detection System — Random Forest powered detection of SQLi, XSS, CSRF
+        WebGuard RF Intrusion Detection System — ML-powered detection of SQLi, XSS, CSRF
       </p>
+
+      {/* Model selector */}
+      <div style={{ marginBottom: '1.5rem', maxWidth: 400 }}>
+        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Detection Model</label>
+        <select
+          value={modelId}
+          onChange={(e) => setModelId(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '0.6rem 1rem',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--bg-card)',
+            borderRadius: 8,
+            color: 'var(--text)',
+            fontSize: '0.9rem',
+          }}
+        >
+          <option value="">Latest model (auto)</option>
+          {modelList.map((m) => (
+            <option key={m.id} value={m.id}>{m.algorithm_label ? `${m.algorithm_label} — ${m.id}` : m.id}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Stats cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>

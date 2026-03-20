@@ -1,6 +1,6 @@
 """
-WebGuard RF - GPU Training Engine (XGBoost)
-Uses XGBoost with CUDA for GPU-accelerated tree ensemble training.
+WebGuard RF - Multi-Algorithm Training Engine
+Supports: XGBoost (GPU), Random Forest, Logistic Regression, SVM, LightGBM, CatBoost.
 """
 
 import time
@@ -20,37 +20,143 @@ from sklearn.metrics import (
 
 from .preprocessing import DataPreprocessor, LABEL_MAP_MULTICLASS, LABEL_MAP_BINARY
 
+ALGORITHMS = ["xgboost", "random_forest", "logistic_regression", "svm", "lightgbm", "catboost"]
+ALGORITHM_LABELS = {
+    "xgboost": "XGBoost",
+    "random_forest": "Random Forest (sklearn)",
+    "logistic_regression": "Logistic Regression",
+    "svm": "SVM",
+    "lightgbm": "LightGBM",
+    "catboost": "CatBoost",
+}
 
-def _get_xgb_model(classification_mode: str, n_estimators: int, max_depth: Optional[int],
-                   min_child_weight: int, colsample_bytree: float, random_state: int,
-                   scale_pos_weight: Optional[float] = None):
-    """Create XGBClassifier configured for GPU-only training."""
-    import xgboost as xgb
-    objective = "binary:logistic" if classification_mode == "binary" else "multi:softprob"
-    num_class = None if classification_mode == "binary" else 4
-    params = {
-        "n_estimators": n_estimators,
-        "max_depth": max_depth or 6,
-        "min_child_weight": min_child_weight,
-        "colsample_bytree": colsample_bytree,
-        "random_state": random_state,
-        "tree_method": "hist",
-        "device": "cuda",
-        "objective": objective,
-        "eval_metric": "mlogloss" if classification_mode == "multiclass" else "logloss",
-    }
-    if num_class:
-        params["num_class"] = num_class
-    if scale_pos_weight is not None:
-        params["scale_pos_weight"] = scale_pos_weight
-    return xgb.XGBClassifier(**params)
+
+def _get_feature_importances(model, feature_columns: list) -> Dict[str, float]:
+    """Get feature importances for any model type."""
+    if hasattr(model, "feature_importances_"):
+        imp = model.feature_importances_
+        if hasattr(imp, "tolist"):
+            imp = imp.tolist()
+        else:
+            imp = list(imp)
+        return dict(zip(feature_columns, imp))
+    if hasattr(model, "coef_"):
+        coef = np.asarray(model.coef_)
+        if coef.ndim == 1:
+            imp = np.abs(coef)
+        else:
+            imp = np.abs(coef).mean(axis=0)
+        imp = imp / (imp.sum() + 1e-10)
+        return dict(zip(feature_columns, imp.tolist()))
+    # Fallback: uniform
+    n = len(feature_columns)
+    return {f: 1.0 / n for f in feature_columns}
+
+
+def _get_model(
+    algorithm: str,
+    classification_mode: str,
+    n_estimators: int,
+    max_depth: Optional[int],
+    min_child_weight: int,
+    colsample_bytree: float,
+    random_state: int,
+    scale_pos_weight: Optional[float],
+    n_features: int,
+) -> Any:
+    """Create model for given algorithm."""
+    if algorithm == "xgboost":
+        import xgboost as xgb
+        objective = "binary:logistic" if classification_mode == "binary" else "multi:softprob"
+        num_class = None if classification_mode == "binary" else 4
+        params = {
+            "n_estimators": n_estimators,
+            "max_depth": max_depth or 6,
+            "min_child_weight": min_child_weight,
+            "colsample_bytree": colsample_bytree,
+            "random_state": random_state,
+            "tree_method": "hist",
+            "device": "cuda",
+            "objective": objective,
+            "eval_metric": "mlogloss" if classification_mode == "multiclass" else "logloss",
+        }
+        if num_class:
+            params["num_class"] = num_class
+        if scale_pos_weight is not None:
+            params["scale_pos_weight"] = scale_pos_weight
+        return xgb.XGBClassifier(**params)
+
+    if algorithm == "random_forest":
+        from sklearn.ensemble import RandomForestClassifier
+        return RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            min_samples_leaf=min_child_weight,
+            max_features="sqrt" if n_features > 1 else "auto",
+            random_state=random_state,
+            n_jobs=-1,
+            class_weight="balanced" if scale_pos_weight else None,
+        )
+
+    if algorithm == "logistic_regression":
+        from sklearn.linear_model import LogisticRegression
+        return LogisticRegression(
+            max_iter=1000,
+            random_state=random_state,
+            class_weight="balanced",
+            n_jobs=-1,
+        )
+
+    if algorithm == "svm":
+        from sklearn.svm import SVC
+        return SVC(
+            kernel="rbf",
+            C=1.0,
+            gamma="scale",
+            probability=True,
+            random_state=random_state,
+            class_weight="balanced",
+        )
+
+    if algorithm == "lightgbm":
+        import lightgbm as lgb
+        objective = "binary" if classification_mode == "binary" else "multiclass"
+        num_class = None if classification_mode == "binary" else 4
+        params = {
+            "n_estimators": n_estimators,
+            "max_depth": max_depth or 6,
+            "min_child_samples": min_child_weight,
+            "feature_fraction": colsample_bytree,
+            "random_state": random_state,
+            "device": "cuda",
+            "objective": objective,
+            "verbose": -1,
+        }
+        if num_class:
+            params["num_class"] = num_class
+        if scale_pos_weight is not None:
+            params["scale_pos_weight"] = scale_pos_weight
+        return lgb.LGBMClassifier(**params)
+
+    if algorithm == "catboost":
+        import catboost as cb
+        return cb.CatBoostClassifier(
+            iterations=n_estimators,
+            depth=max_depth or 6,
+            random_state=random_state,
+            verbose=0,
+            task_type="GPU",
+        )
+
+    raise ValueError(f"Unknown algorithm: {algorithm}")
 
 
 class RandomForestTrainer:
-    """Train tree ensemble models for web attack detection using GPU (XGBoost + CUDA)."""
+    """Train classification models for web attack detection. Supports multiple algorithms."""
 
     def __init__(
         self,
+        algorithm: Literal["xgboost", "random_forest", "logistic_regression", "svm", "lightgbm", "catboost"] = "xgboost",
         classification_mode: Literal["binary", "multiclass"] = "multiclass",
         feature_mode: Literal["payload_only", "response_only", "hybrid", "sqli_37"] = "payload_only",
         n_estimators: int = 200,
@@ -65,6 +171,7 @@ class RandomForestTrainer:
         hyperparameter_tuning: bool = False,
         progress_callback: Optional[Callable[[str, int], None]] = None,
     ):
+        self.algorithm = algorithm
         self.classification_mode = classification_mode
         self._feature_mode = feature_mode
         self.n_estimators = n_estimators
@@ -95,6 +202,22 @@ class RandomForestTrainer:
                 data.update(details)
             self.progress_callback(data)
 
+    def _check_gpu_if_needed(self):
+        """Verify GPU for algorithms that require it."""
+        gpu_algorithms = ["xgboost", "lightgbm", "catboost"]
+        if self.algorithm not in gpu_algorithms:
+            return
+        try:
+            import subprocess
+            r = subprocess.run(["nvidia-smi"], capture_output=True, timeout=5)
+            if r.returncode != 0:
+                raise RuntimeError("NVIDIA GPU not detected. XGBoost/LightGBM/CatBoost use GPU.")
+        except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+            raise RuntimeError(
+                f"NVIDIA GPU not detected. {ALGORITHM_LABELS.get(self.algorithm, self.algorithm)} uses GPU. "
+                f"Install CUDA and ensure nvidia-smi works. Error: {e}"
+            ) from e
+
     def train(
         self,
         data_path: str,
@@ -103,19 +226,9 @@ class RandomForestTrainer:
         val_ratio: float = 0.15,
         test_ratio: float = 0.15,
     ) -> Dict[str, Any]:
-        """Train model on GPU and return metrics."""
-        import xgboost as xgb
-        try:
-            # Verify GPU is available
-            import subprocess
-            r = subprocess.run(["nvidia-smi"], capture_output=True, timeout=5)
-            if r.returncode != 0:
-                raise RuntimeError("NVIDIA GPU not detected. Training requires a CUDA-capable GPU.")
-        except (FileNotFoundError, subprocess.TimeoutExpired) as e:
-            raise RuntimeError(
-                "NVIDIA GPU not detected. Training uses GPU only. "
-                "Install CUDA and ensure nvidia-smi works. Error: " + str(e)
-            ) from e
+        """Train model and return metrics."""
+        if self.algorithm in ("xgboost", "lightgbm", "catboost"):
+            self._check_gpu_if_needed()
 
         self._log("Loading data...", 5, {"step": "load", "detail": "Reading dataset"})
         if data_path.endswith(".parquet"):
@@ -140,16 +253,17 @@ class RandomForestTrainer:
         train_size, val_size, test_size = len(X_train), len(X_val), len(X_test)
 
         n_features = len(self.feature_columns_)
-        colsample = 1.0 / (n_features ** 0.5) if self.max_features == "sqrt" else 1.0
+        colsample = 1.0 / (n_features ** 0.5) if self.max_features == "sqrt" and n_features > 1 else 1.0
         min_child = max(1, self.min_samples_leaf)
         scale_pos_weight = None
         if self.class_weight == "balanced" and self.classification_mode == "binary":
             n_pos = (y_train == 1).sum()
             n_neg = (y_train == 0).sum()
             if n_pos > 0:
-                scale_pos_weight = n_neg / n_pos
+                scale_pos_weight = float(n_neg / n_pos)
 
-        self._log("Training on GPU (XGBoost)...", 25, {
+        algo_label = ALGORITHM_LABELS.get(self.algorithm, self.algorithm)
+        self._log(f"Training ({algo_label})...", 25, {
             "step": "training",
             "samples_loaded": total_samples,
             "train_size": train_size,
@@ -160,33 +274,24 @@ class RandomForestTrainer:
         })
         start = time.time()
 
-        if self.hyperparameter_tuning:
-            self._log("Hyperparameter tuning (GPU)...", 30)
+        if self.hyperparameter_tuning and self.algorithm in ("xgboost", "random_forest"):
+            self._log("Hyperparameter tuning...", 30)
             from sklearn.model_selection import RandomizedSearchCV
-            base = _get_xgb_model(
-                self.classification_mode, 100, 20, min_child, colsample,
-                self.random_state, scale_pos_weight
+            base = _get_model(
+                self.algorithm, self.classification_mode, 100, 20,
+                min_child, colsample, self.random_state, scale_pos_weight, n_features,
             )
-            param_grid = {
-                "n_estimators": [100, 200, 300],
-                "max_depth": [20, 30, 40],
-                "min_child_weight": [1, 2, 5],
-                "colsample_bytree": [0.6, 0.8, 1.0],
-            }
-            search = RandomizedSearchCV(
-                base, param_grid, n_iter=10, cv=3, random_state=self.random_state
-            )
+            if self.algorithm == "random_forest":
+                param_grid = {"n_estimators": [100, 200, 300], "max_depth": [20, 30, 40], "min_samples_leaf": [1, 2, 5], "max_features": ["sqrt", "log2"]}
+            else:
+                param_grid = {"n_estimators": [100, 200, 300], "max_depth": [20, 30, 40], "min_child_weight": [1, 2, 5], "colsample_bytree": [0.6, 0.8, 1.0]}
+            search = RandomizedSearchCV(base, param_grid, n_iter=10, cv=3, random_state=self.random_state)
             search.fit(X_train, y_train)
             self.model_ = search.best_estimator_
         else:
-            self.model_ = _get_xgb_model(
-                self.classification_mode,
-                self.n_estimators,
-                self.max_depth,
-                min_child,
-                colsample,
-                self.random_state,
-                scale_pos_weight,
+            self.model_ = _get_model(
+                self.algorithm, self.classification_mode, self.n_estimators, self.max_depth,
+                min_child, colsample, self.random_state, scale_pos_weight, n_features,
             )
             self.model_.fit(X_train, y_train)
 
@@ -203,12 +308,7 @@ class RandomForestTrainer:
             metrics[split_name] = self._compute_metrics(y_s, pred, X_s)
 
         metrics["train_time_seconds"] = train_time
-        imp = self.model_.feature_importances_
-        if hasattr(imp, "tolist"):
-            imp = imp.tolist()
-        else:
-            imp = list(imp)
-        metrics["feature_importance"] = dict(zip(self.feature_columns_, imp))
+        metrics["feature_importance"] = _get_feature_importances(self.model_, self.feature_columns_)
 
         self._log("Saving model...", 95)
         Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -223,13 +323,18 @@ class RandomForestTrainer:
                 "label_map": self.label_map_,
                 "classification_mode": self.classification_mode,
                 "feature_mode": self._feature_mode,
+                "algorithm": self.algorithm,
+                "algorithm_label": ALGORITHM_LABELS.get(self.algorithm, self.algorithm),
             },
             prep_path,
         )
         metrics["model_path"] = str(model_path)
         metrics["preprocessor_path"] = str(prep_path)
         metrics["model_id"] = model_id
+        metrics["algorithm"] = self.algorithm
+        metrics["algorithm_label"] = ALGORITHM_LABELS.get(self.algorithm, self.algorithm)
         metrics["config"] = {
+            "algorithm": self.algorithm,
             "n_estimators": self.n_estimators,
             "max_depth": self.max_depth,
             "feature_count": len(self.feature_columns_),

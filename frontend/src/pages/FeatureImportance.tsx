@@ -44,7 +44,7 @@ const metricLabelStyle = {
 const TOP_N_OPTIONS = [10, 20, 30, 50, 100, 0] // 0 = all
 
 export default function FeatureImportance() {
-  const [modelList, setModelList] = useState<{ id: string; name?: string }[]>([])
+  const [modelList, setModelList] = useState<{ id: string; name?: string; algorithm_label?: string }[]>([])
   const [modelId, setModelId] = useState('')
   const [detail, setDetail] = useState<ModelDetail | null>(null)
   const [loading, setLoading] = useState(false)
@@ -72,7 +72,7 @@ export default function FeatureImportance() {
   }
 
   useEffect(() => {
-    models.list().then(({ data: res }) => setModelList(res.models || [])).catch(() => [])
+    models.list({ include_metrics: true }).then(({ data: res }) => setModelList(res.models || [])).catch(() => [])
   }, [])
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function FeatureImportance() {
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.75rem' }}>Feature Importance</h1>
         <p style={{ color: 'var(--text-muted)', margin: 0 }}>
-          Top contributing features from Random Forest. Features with higher importance have stronger predictive power for attack detection.
+          Top contributing features from the selected model. Features with higher importance have stronger predictive power for attack detection.
         </p>
       </div>
 
@@ -139,7 +139,7 @@ export default function FeatureImportance() {
               <option value="">Select a model...</option>
               {modelList.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name ?? m.id}
+                  {m.algorithm_label ? `${m.algorithm_label} — ${m.id}` : m.name ?? m.id}
                 </option>
               ))}
             </select>

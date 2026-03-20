@@ -4,6 +4,7 @@ WebGuard RF - Models API
 
 import joblib
 from pathlib import Path
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
@@ -59,6 +60,8 @@ def list_models(
             metrics = metrics_map.get(m["id"])
             if metrics:
                 m["metrics"] = metrics
+                m["algorithm"] = metrics.get("algorithm")
+                m["algorithm_label"] = metrics.get("algorithm_label") or m.get("algorithm") or "Unknown"
                 test = metrics.get("test") or {}
                 m["test_accuracy"] = test.get("accuracy")
                 m["test_f1_macro"] = test.get("f1_macro")
@@ -67,13 +70,46 @@ def list_models(
                 m["train_time_seconds"] = metrics.get("train_time_seconds")
             else:
                 m["metrics"] = None
+                algo, algo_label = _get_algorithm_from_prep(m["id"])
+                m["algorithm"] = algo
+                m["algorithm_label"] = algo_label or algo or "Unknown"
                 m["test_accuracy"] = None
                 m["test_f1_macro"] = None
                 m["test_precision_macro"] = None
                 m["test_recall_macro"] = None
                 m["train_time_seconds"] = None
+            if not m.get("algorithm_label"):
+                m["algorithm_label"] = m.get("algorithm") or "Unknown"
 
     return {"models": models}
+
+
+def _get_feature_importances(model, feature_columns: list) -> dict:
+    """Get feature importances for any model type."""
+    if hasattr(model, "feature_importances_"):
+        imp = model.feature_importances_
+        imp = imp.tolist() if hasattr(imp, "tolist") else list(imp)
+        return dict(zip(feature_columns, imp))
+    if hasattr(model, "coef_"):
+        import numpy as np
+        coef = np.asarray(model.coef_)
+        imp = np.abs(coef).mean(axis=0) if coef.ndim > 1 else np.abs(coef)
+        imp = imp / (imp.sum() + 1e-10)
+        return dict(zip(feature_columns, imp.tolist()))
+    n = len(feature_columns)
+    return {f: 1.0 / n for f in feature_columns}
+
+
+def _get_algorithm_from_prep(model_id: str) -> tuple[Optional[str], Optional[str]]:
+    """Load preprocessor to get algorithm (for models without job metrics). Returns (algorithm, algorithm_label)."""
+    prep_path = _MODELS_DIR / f"{model_id}_preprocessor.joblib"
+    if not prep_path.exists():
+        return None, None
+    try:
+        prep_data = joblib.load(prep_path)
+        return prep_data.get("algorithm"), prep_data.get("algorithm_label")
+    except Exception:
+        return None, None
 
 
 @router.get("/{model_id}")
@@ -87,12 +123,14 @@ def get_model_detail(model_id: str, user: dict = Depends(get_current_user)):
     prep_data = joblib.load(prep_path)
     model = joblib.load(model_path)
     feature_columns = prep_data.get("feature_columns", [])
-    importances = dict(zip(feature_columns, model.feature_importances_.tolist()))
+    importances = _get_feature_importances(model, feature_columns)
     top_features = sorted(importances.items(), key=lambda x: -x[1])
     return {
         "id": model_id,
         "classification_mode": prep_data.get("classification_mode", "multiclass"),
         "feature_mode": prep_data.get("feature_mode", "payload_only"),
+        "algorithm": prep_data.get("algorithm"),
+        "algorithm_label": prep_data.get("algorithm_label"),
         "feature_count": len(feature_columns),
         "feature_importance": importances,
         "top_features": [{"name": k, "importance": round(v, 6)} for k, v in top_features],

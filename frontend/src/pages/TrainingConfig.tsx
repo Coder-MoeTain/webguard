@@ -16,8 +16,18 @@ type JobStatus = {
   error?: string
 }
 
+const ALGORITHMS = [
+  { value: 'xgboost', label: 'XGBoost (GPU)' },
+  { value: 'random_forest', label: 'Random Forest (sklearn)' },
+  { value: 'logistic_regression', label: 'Logistic Regression' },
+  { value: 'svm', label: 'SVM' },
+  { value: 'lightgbm', label: 'LightGBM' },
+  { value: 'catboost', label: 'CatBoost' },
+] as const
+
 type ConfigState = {
   data_path: string
+  algorithm: string
   classification_mode: 'binary' | 'multiclass'
   feature_mode: 'payload_only' | 'response_only' | 'hybrid' | 'sqli_37'
   train_ratio: number
@@ -46,6 +56,7 @@ export default function TrainingConfig() {
   const [status, setStatus] = useState<JobStatus | null>(null)
   const [config, setConfig] = useState<ConfigState>({
     data_path: 'data/sample_features.parquet',
+    algorithm: 'xgboost',
     classification_mode: 'multiclass' as 'binary' | 'multiclass',
     feature_mode: 'payload_only' as 'payload_only' | 'response_only' | 'hybrid' | 'sqli_37',
     train_ratio: 0.7,
@@ -111,7 +122,7 @@ export default function TrainingConfig() {
     <div>
       <h1 style={{ margin: '0 0 1rem' }}>Training Configuration</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        Configure Random Forest parameters and start training.
+        Choose algorithm and configure parameters for training.
       </p>
       <div style={{ maxWidth: 600, background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
         {error && <div style={{ padding: '0.5rem', background: 'rgba(248,113,113,0.2)', borderRadius: 4, marginBottom: '1rem', color: 'var(--danger)' }}>{error}</div>}
@@ -139,7 +150,19 @@ export default function TrainingConfig() {
           </div>
         </div>
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Algorithm</label>
+              <select
+                value={config.algorithm}
+                onChange={(e) => setConfig({ ...config, algorithm: e.target.value })}
+                style={{ width: '100%', padding: '0.6rem', background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 4, color: 'var(--text)' }}
+              >
+                {ALGORITHMS.map((a) => (
+                  <option key={a.value} value={a.value}>{a.label}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.25rem' }}>Dataset</label>
               <select
@@ -212,7 +235,7 @@ export default function TrainingConfig() {
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <input type="checkbox" checked={config.hyperparameter_tuning} onChange={(e) => { setConfig({ ...config, hyperparameter_tuning: e.target.checked }); setActivePreset(null) }} />
-              Hyperparameter Tuning (RandomizedSearchCV)
+              Hyperparameter Tuning (RandomizedSearchCV, XGBoost/Random Forest only)
             </label>
           </div>
           <button type="submit" disabled={isRunning} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', border: 'none', borderRadius: 4, color: 'var(--bg-primary)', fontWeight: 600, cursor: isRunning ? 'not-allowed' : 'pointer' }}>
