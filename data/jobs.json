@@ -2184,5 +2184,1057 @@
     "test_size": 750150,
     "feature_count": 5,
     "n_estimators": 200
+  },
+  "6b400c2c-671": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "random_forest",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 200,
+      "max_depth": 20,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 200,
+    "train_time_seconds": 532.69,
+    "model_id": "rf_1773995962",
+    "metrics": {
+      "train": {
+        "accuracy": 0.7076992337815962,
+        "precision_macro": 0.601791502553441,
+        "recall_macro": 0.7218779131180215,
+        "f1_macro": 0.6413117501174879,
+        "f1_weighted": 0.6216574742513569,
+        "roc_auc": 0.8868028197490467,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            672358,
+            0,
+            24896,
+            12401
+          ],
+          [
+            9126,
+            0,
+            908569,
+            12501
+          ],
+          [
+            9287,
+            0,
+            908663,
+            12326
+          ],
+          [
+            9369,
+            0,
+            24782,
+            896421
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9603193646984889,
+            "recall": 0.9474434760552662,
+            "f1": 0.9538379693501537
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867203025319914,
+            "recall": 0.9767671099759642,
+            "f1": 0.6496979464361683
+          },
+          "csrf": {
+            "precision": 0.9601263429832839,
+            "recall": 0.9633010664408558,
+            "f1": 0.9617110846836292
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.7074211824301806,
+        "precision_macro": 0.6013972047891789,
+        "recall_macro": 0.7215847509122547,
+        "f1_macro": 0.6409911933168172,
+        "f1_weighted": 0.6213478627158994,
+        "roc_auc": 0.8865872374223271,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            143995,
+            0,
+            5271,
+            2803
+          ],
+          [
+            1929,
+            0,
+            194678,
+            2721
+          ],
+          [
+            1988,
+            0,
+            194662,
+            2695
+          ],
+          [
+            2105,
+            0,
+            5288,
+            192015
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9598578827732857,
+            "recall": 0.9469056809737685,
+            "f1": 0.9533377912250154
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867779114226342,
+            "recall": 0.976508063909303,
+            "f1": 0.6496919451842655
+          },
+          "csrf": {
+            "precision": 0.9589530249607958,
+            "recall": 0.9629252587659473,
+            "f1": 0.9609350368579879
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7073012064253816,
+        "precision_macro": 0.6016875494000895,
+        "recall_macro": 0.7214774022333568,
+        "f1_macro": 0.641019665384484,
+        "f1_weighted": 0.6213772962834263,
+        "roc_auc": 0.8864736739186581,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            144009,
+            0,
+            5462,
+            2598
+          ],
+          [
+            2030,
+            0,
+            194706,
+            2592
+          ],
+          [
+            1959,
+            0,
+            194716,
+            2670
+          ],
+          [
+            2044,
+            0,
+            5507,
+            191857
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9597912584476347,
+            "recall": 0.9469977444449559,
+            "f1": 0.9533515826964262
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.486314627451666,
+            "recall": 0.976778951064737,
+            "f1": 0.6493390425120387
+          },
+          "csrf": {
+            "precision": 0.960644311701057,
+            "recall": 0.9621329134237343,
+            "f1": 0.9613880363294707
+          }
+        }
+      },
+      "train_time_seconds": 532.692661523819,
+      "feature_importance": {
+        "status_code": 0.15484365402961625,
+        "response_length": 0.37750432752337365,
+        "response_time": 0.3329735635176951,
+        "error_flag": 0.0,
+        "redirection_flag": 0.13467845492931507
+      },
+      "model_path": "models\\rf_1773995962.joblib",
+      "preprocessor_path": "models\\rf_1773995962_preprocessor.joblib",
+      "model_id": "rf_1773995962",
+      "algorithm": "random_forest",
+      "algorithm_label": "Random Forest (sklearn)",
+      "config": {
+        "algorithm": "random_forest",
+        "n_estimators": 200,
+        "max_depth": 20,
+        "feature_count": 5,
+        "feature_mode": "payload_only",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "6340e7d4-add": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "xgboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500,
+    "train_time_seconds": 50.5,
+    "model_id": "rf_1773996196",
+    "metrics": {
+      "train": {
+        "accuracy": 0.7076992337815962,
+        "precision_macro": 0.601791502553441,
+        "recall_macro": 0.7218779131180215,
+        "f1_macro": 0.6413117501174879,
+        "f1_weighted": 0.6216574742513569,
+        "roc_auc": 0.8868028197490467,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            672358,
+            0,
+            24896,
+            12401
+          ],
+          [
+            9126,
+            0,
+            908569,
+            12501
+          ],
+          [
+            9287,
+            0,
+            908663,
+            12326
+          ],
+          [
+            9369,
+            0,
+            24782,
+            896421
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9603193646984889,
+            "recall": 0.9474434760552662,
+            "f1": 0.9538379693501537
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867203025319914,
+            "recall": 0.9767671099759642,
+            "f1": 0.6496979464361683
+          },
+          "csrf": {
+            "precision": 0.9601263429832839,
+            "recall": 0.9633010664408558,
+            "f1": 0.9617110846836292
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.7074211824301806,
+        "precision_macro": 0.6013972047891789,
+        "recall_macro": 0.7215847509122547,
+        "f1_macro": 0.6409911933168172,
+        "f1_weighted": 0.6213478627158994,
+        "roc_auc": 0.8865872374223271,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            143995,
+            0,
+            5271,
+            2803
+          ],
+          [
+            1929,
+            0,
+            194678,
+            2721
+          ],
+          [
+            1988,
+            0,
+            194662,
+            2695
+          ],
+          [
+            2105,
+            0,
+            5288,
+            192015
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9598578827732857,
+            "recall": 0.9469056809737685,
+            "f1": 0.9533377912250154
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867779114226342,
+            "recall": 0.976508063909303,
+            "f1": 0.6496919451842655
+          },
+          "csrf": {
+            "precision": 0.9589530249607958,
+            "recall": 0.9629252587659473,
+            "f1": 0.9609350368579879
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7073012064253816,
+        "precision_macro": 0.6016875494000895,
+        "recall_macro": 0.7214774022333568,
+        "f1_macro": 0.641019665384484,
+        "f1_weighted": 0.6213772962834263,
+        "roc_auc": 0.8864736739186581,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            144009,
+            0,
+            5462,
+            2598
+          ],
+          [
+            2030,
+            0,
+            194706,
+            2592
+          ],
+          [
+            1959,
+            0,
+            194716,
+            2670
+          ],
+          [
+            2044,
+            0,
+            5507,
+            191857
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9597912584476347,
+            "recall": 0.9469977444449559,
+            "f1": 0.9533515826964262
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.486314627451666,
+            "recall": 0.976778951064737,
+            "f1": 0.6493390425120387
+          },
+          "csrf": {
+            "precision": 0.960644311701057,
+            "recall": 0.9621329134237343,
+            "f1": 0.9613880363294707
+          }
+        }
+      },
+      "train_time_seconds": 50.496543169021606,
+      "feature_importance": {
+        "status_code": 0.39352989196777344,
+        "response_length": 0.43612781167030334,
+        "response_time": 0.1703423261642456,
+        "error_flag": 0.0,
+        "redirection_flag": 0.0
+      },
+      "model_path": "models\\rf_1773996196.joblib",
+      "preprocessor_path": "models\\rf_1773996196_preprocessor.joblib",
+      "model_id": "rf_1773996196",
+      "algorithm": "xgboost",
+      "algorithm_label": "XGBoost",
+      "config": {
+        "algorithm": "xgboost",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 5,
+        "feature_mode": "payload_only",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "a1409979-6e2": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "logistic_regression",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500,
+    "train_time_seconds": 120.34,
+    "model_id": "rf_1773996398",
+    "metrics": {
+      "train": {
+        "accuracy": 0.7076992337815962,
+        "precision_macro": 0.601791502553441,
+        "recall_macro": 0.7218779131180215,
+        "f1_macro": 0.6413117501174879,
+        "f1_weighted": 0.6216574742513569,
+        "roc_auc": 0.8867838905228085,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            672358,
+            0,
+            24896,
+            12401
+          ],
+          [
+            9126,
+            0,
+            908569,
+            12501
+          ],
+          [
+            9287,
+            0,
+            908663,
+            12326
+          ],
+          [
+            9369,
+            0,
+            24782,
+            896421
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9603193646984889,
+            "recall": 0.9474434760552662,
+            "f1": 0.9538379693501537
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867203025319914,
+            "recall": 0.9767671099759642,
+            "f1": 0.6496979464361683
+          },
+          "csrf": {
+            "precision": 0.9601263429832839,
+            "recall": 0.9633010664408558,
+            "f1": 0.9617110846836292
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.7074211824301806,
+        "precision_macro": 0.6013972047891789,
+        "recall_macro": 0.7215847509122547,
+        "f1_macro": 0.6409911933168172,
+        "f1_weighted": 0.6213478627158994,
+        "roc_auc": 0.8864910238199846,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            143995,
+            0,
+            5271,
+            2803
+          ],
+          [
+            1929,
+            0,
+            194678,
+            2721
+          ],
+          [
+            1988,
+            0,
+            194662,
+            2695
+          ],
+          [
+            2105,
+            0,
+            5288,
+            192015
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9598578827732857,
+            "recall": 0.9469056809737685,
+            "f1": 0.9533377912250154
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.4867779114226342,
+            "recall": 0.976508063909303,
+            "f1": 0.6496919451842655
+          },
+          "csrf": {
+            "precision": 0.9589530249607958,
+            "recall": 0.9629252587659473,
+            "f1": 0.9609350368579879
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.7073012064253816,
+        "precision_macro": 0.6016875494000895,
+        "recall_macro": 0.7214774022333568,
+        "f1_macro": 0.641019665384484,
+        "f1_weighted": 0.6213772962834263,
+        "roc_auc": 0.8865129430514951,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            144009,
+            0,
+            5462,
+            2598
+          ],
+          [
+            2030,
+            0,
+            194706,
+            2592
+          ],
+          [
+            1959,
+            0,
+            194716,
+            2670
+          ],
+          [
+            2044,
+            0,
+            5507,
+            191857
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9597912584476347,
+            "recall": 0.9469977444449559,
+            "f1": 0.9533515826964262
+          },
+          "sqli": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "xss": {
+            "precision": 0.486314627451666,
+            "recall": 0.976778951064737,
+            "f1": 0.6493390425120387
+          },
+          "csrf": {
+            "precision": 0.960644311701057,
+            "recall": 0.9621329134237343,
+            "f1": 0.9613880363294707
+          }
+        }
+      },
+      "train_time_seconds": 120.34017324447632,
+      "feature_importance": {
+        "status_code": 0.46435226867402496,
+        "response_length": 0.0013112360288152324,
+        "response_time": 0.5330600468967164,
+        "error_flag": 0.0,
+        "redirection_flag": 0.0012764453676572596
+      },
+      "model_path": "models\\rf_1773996398.joblib",
+      "preprocessor_path": "models\\rf_1773996398_preprocessor.joblib",
+      "model_id": "rf_1773996398",
+      "algorithm": "logistic_regression",
+      "algorithm_label": "Logistic Regression",
+      "config": {
+        "algorithm": "logistic_regression",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 5,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "406cab64-4ea": {
+    "phase": "Training (SVM)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "svm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500
+  },
+  "002db7c2-08f": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "lightgbm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500,
+    "error": "No module named 'lightgbm'"
+  },
+  "eddf0595-436": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_9a981bce64ca.parquet",
+      "algorithm": "lightgbm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 5,
+    "n_estimators": 500,
+    "error": "CUDA Tree Learner was not enabled in this build.\nPlease recompile with CMake option -DUSE_CUDA=1"
+  },
+  "f6f6bdf5-312": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_083c0da093da.parquet",
+      "algorithm": "xgboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 1000000,
+    "train_size": 699999,
+    "val_size": 150000,
+    "test_size": 150001,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "train_time_seconds": 516.42,
+    "model_id": "rf_1774001165",
+    "metrics": {
+      "train": {
+        "accuracy": 0.9601099430142043,
+        "precision_macro": 0.24002748575355107,
+        "recall_macro": 0.25,
+        "f1_macro": 0.24491226791538365,
+        "f1_weighted": 0.9405708143668741,
+        "roc_auc": 0.5589405911499962,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            9277,
+            0,
+            0
+          ],
+          [
+            0,
+            672076,
+            0,
+            0
+          ],
+          [
+            0,
+            9375,
+            0,
+            0
+          ],
+          [
+            0,
+            9271,
+            0,
+            0
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "sqli": {
+            "precision": 0.9601099430142043,
+            "recall": 1.0,
+            "f1": 0.9796490716615346
+          },
+          "xss": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "csrf": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9601133333333334,
+        "precision_macro": 0.24002833333333334,
+        "recall_macro": 0.25,
+        "f1_macro": 0.24491270912906396,
+        "f1_weighted": 0.9405758301504108,
+        "roc_auc": 0.5006516002673125,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            1988,
+            0,
+            0
+          ],
+          [
+            0,
+            144017,
+            0,
+            0
+          ],
+          [
+            0,
+            2009,
+            0,
+            0
+          ],
+          [
+            0,
+            1986,
+            0,
+            0
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "sqli": {
+            "precision": 0.9601133333333334,
+            "recall": 1.0,
+            "f1": 0.9796508365162558
+          },
+          "xss": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "csrf": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.9601069326204492,
+        "precision_macro": 0.2400267331551123,
+        "recall_macro": 0.25,
+        "f1_macro": 0.24491187614363746,
+        "f1_weighted": 0.9405663606663486,
+        "roc_auc": 0.4989359506998084,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            1988,
+            0,
+            0
+          ],
+          [
+            0,
+            144017,
+            0,
+            0
+          ],
+          [
+            0,
+            2009,
+            0,
+            0
+          ],
+          [
+            0,
+            1987,
+            0,
+            0
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "sqli": {
+            "precision": 0.9601069326204492,
+            "recall": 1.0,
+            "f1": 0.9796475045745499
+          },
+          "xss": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "csrf": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        }
+      },
+      "train_time_seconds": 516.4169270992279,
+      "feature_importance": {
+        "has_select": 0.02144664339721203,
+        "has_union": 0.020486805588006973,
+        "has_sleep": 0.019442478194832802,
+        "has_or_1_equals_1": 0.018877847120165825,
+        "has_drop": 0.01795351505279541,
+        "has_insert": 0.019111325964331627,
+        "has_delete": 0.0149505864828825,
+        "has_update": 0.02247670851647854,
+        "has_information_schema": 0.02416267804801464,
+        "has_where": 0.03802206739783287,
+        "has_order_by": 0.0,
+        "has_group_by": 0.06000901013612747,
+        "has_having": 0.0,
+        "has_like": 0.0,
+        "has_in": 0.0299842432141304,
+        "has_hex": 0.03835562244057655,
+        "has_char": 0.009038392454385757,
+        "has_concat": 0.028930434957146645,
+        "has_ascii": 0.0,
+        "has_substring": 0.0,
+        "has_count": 0.03697282448410988,
+        "has_benchmark": 0.02765001356601715,
+        "has_waitfor": 0.02185809426009655,
+        "has_exec": 0.01783289946615696,
+        "has_xp_cmdshell": 0.006941632833331823,
+        "quote_count": 0.019239109009504318,
+        "comment_marker_count": 0.019581228494644165,
+        "semicolon_count": 0.026788856834173203,
+        "equals_count": 0.02790125459432602,
+        "parentheses_count": 0.027643466368317604,
+        "keyword_density": 0.028191406279802322,
+        "sqli_entropy": 0.04888152703642845,
+        "payload_length": 0.024182194843888283,
+        "special_char_ratio": 0.03265943378210068,
+        "encoded_char_ratio": 0.04177551716566086,
+        "logical_op_count": 0.03347555175423622,
+        "comparison_count": 0.029599657282233238,
+        "has_script_tag": 0.0,
+        "has_javascript_protocol": 0.0,
+        "has_onerror": 0.0,
+        "has_onload": 0.0,
+        "has_alert": 0.0,
+        "has_document_write": 0.0,
+        "has_eval": 0.0,
+        "html_tag_count": 0.0,
+        "angle_bracket_count": 0.0,
+        "encoded_js_pattern": 0.0,
+        "suspicious_dom_keywords": 0.0,
+        "svg_script_count": 0.0,
+        "missing_csrf_token": 0.0,
+        "invalid_csrf_token": 0.0,
+        "cross_origin_flag": 0.028181465342640877,
+        "missing_referer": 0.0,
+        "state_change_request": 0.0,
+        "suspicious_cookie_usage": 0.0,
+        "same_site_violation": 0.0,
+        "request_method_get": 0.0,
+        "request_method_post": 0.0,
+        "url_length": 0.030729789286851883,
+        "number_count": 0.04879945144057274,
+        "whitespace_ratio": 0.03786614537239075,
+        "has_cookies": 0.0,
+        "has_referer": 0.0
+      },
+      "model_path": "models\\rf_1774001165.joblib",
+      "preprocessor_path": "models\\rf_1774001165_preprocessor.joblib",
+      "model_id": "rf_1774001165",
+      "algorithm": "xgboost",
+      "algorithm_label": "XGBoost",
+      "config": {
+        "algorithm": "xgboost",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 63,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
   }
 }

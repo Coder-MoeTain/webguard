@@ -41,6 +41,26 @@ def reset_models(user: dict = Depends(get_current_user)):
     return {"deleted": deleted, "count": len(deleted)}
 
 
+@router.delete("/{model_id}")
+def delete_model(model_id: str, user: dict = Depends(get_current_user)):
+    """Delete a specific model and its preprocessor."""
+    model_path = _MODELS_DIR / f"{model_id}.joblib"
+    prep_path = _MODELS_DIR / f"{model_id}_preprocessor.joblib"
+
+    deleted: list[str] = []
+    for p in (model_path, prep_path):
+        if p.exists():
+            try:
+                p.unlink()
+                deleted.append(p.name)
+            except OSError as e:
+                raise HTTPException(500, f"Failed to delete {p.name}: {e}")
+
+    if not deleted:
+        raise HTTPException(404, "Model not found")
+    return {"deleted": deleted, "count": len(deleted)}
+
+
 @router.get("/")
 def list_models(
     include_metrics: bool = Query(False, description="Include test/train/val metrics per model"),
@@ -52,7 +72,28 @@ def list_models(
     models = []
     for f in models_dir.glob("*.joblib"):
         if "_preprocessor" not in f.name:
-            models.append({"id": f.stem, "path": str(f), "name": f.name})
+            model_id = f.stem
+            algorithm = None
+            algorithm_label = None
+            prep_path = models_dir / f"{model_id}_preprocessor.joblib"
+            if prep_path.exists():
+                try:
+                    prep_data = joblib.load(prep_path)
+                    algorithm = prep_data.get("algorithm")
+                    algorithm_label = prep_data.get("algorithm_label") or algorithm
+                except Exception:
+                    algorithm = None
+                    algorithm_label = None
+            display_name = algorithm_label or algorithm or f.name
+            models.append(
+                {
+                    "id": model_id,
+                    "path": str(f),
+                    "name": display_name,
+                    "algorithm": algorithm,
+                    "algorithm_label": algorithm_label,
+                }
+            )
 
     if include_metrics:
         metrics_map = _get_model_metrics_map()

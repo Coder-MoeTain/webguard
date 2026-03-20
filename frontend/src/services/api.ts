@@ -45,6 +45,7 @@ export const datasets = {
     api.post('/datasets/generate', config),
   generationStatus: (jobId: string) => api.get(`/datasets/generation/${jobId}/status`),
   reset: () => api.post('/datasets/reset'),
+  delete: (path: string) => api.delete('/datasets/delete', { params: { path } }),
   upload: (file: File) => {
     const form = new FormData()
     form.append('file', file)
@@ -55,6 +56,7 @@ export const datasets = {
 export const features = {
   extract: (config: { input_path: string; output_path?: string; feature_mode: string; format?: string }) =>
     api.post('/features/extract', config),
+  status: (jobId: string) => api.get(`/features/extraction/${jobId}/status`),
 }
 
 export const training = {
@@ -69,6 +71,7 @@ export const models = {
   detail: (modelId: string) => api.get(`/models/${modelId}`),
   download: (modelId: string) => api.get(`/models/${modelId}/download`, { responseType: 'blob' }),
   reset: () => api.post('/models/reset'),
+  delete: (modelId: string) => api.delete(`/models/${modelId}`),
 }
 
 export const inference = {
@@ -81,6 +84,10 @@ export const experiments = {
 
 export const reports = {
   export: (jobId: string, format: string) => api.post('/reports/export', { job_id: jobId, format }),
+  preview: (jobId: string, format: 'html' | 'markdown') =>
+    api.get(`/reports/${jobId}/preview`, { params: { format }, responseType: 'text' }),
+  download: (jobId: string, format: 'html' | 'markdown') =>
+    api.get(`/reports/${jobId}/download`, { params: { format }, responseType: 'blob' }),
 }
 
 export const ids = {

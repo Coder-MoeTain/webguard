@@ -5,6 +5,8 @@ import { Table2 } from 'lucide-react'
 export default function DatasetBrowser() {
   const [datasetList, setDatasetList] = useState<{ path: string; name: string }[]>([])
   const [selectedPath, setSelectedPath] = useState('')
+  const selectedDataset = datasetList.find((d) => d.path === selectedPath)
+  const selectedDatasetName = selectedDataset?.name || selectedPath
   const [data, setData] = useState<{
     columns: string[]
     rows: Record<string, string>[]
@@ -17,8 +19,14 @@ export default function DatasetBrowser() {
   const [error, setError] = useState('')
   const [limit, setLimit] = useState(100)
 
+  const loadDatasets = () => {
+    datasets.list()
+      .then(({ data: res }) => setDatasetList(res.datasets || []))
+      .catch(() => setDatasetList([]))
+  }
+
   useEffect(() => {
-    datasets.list().then(({ data: res }) => setDatasetList(res.datasets || [])).catch(() => [])
+    loadDatasets()
   }, [])
 
   useEffect(() => {
@@ -33,6 +41,25 @@ export default function DatasetBrowser() {
       .catch((err) => setError(err.response?.data?.detail || String(err)))
       .finally(() => setLoading(false))
   }, [selectedPath, limit])
+
+  const handleDelete = async () => {
+    if (!selectedPath) return
+    const isFeatureFile = selectedPath.includes('features_')
+    const ok = window.confirm(
+      `Delete ${isFeatureFile ? 'feature file' : 'dataset'}?\n\n${selectedDatasetName}\n\n${selectedPath}`,
+    )
+    if (!ok) return
+    try {
+      setError('')
+      await datasets.delete(selectedPath)
+      setSelectedPath('')
+      setData(null)
+      loadDatasets()
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setError(msg || 'Delete failed')
+    }
+  }
 
   return (
     <div>
@@ -59,6 +86,24 @@ export default function DatasetBrowser() {
           </select>
         </div>
         <div>
+          <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.85rem' }}>&nbsp;</label>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={!selectedPath}
+            style={{
+              padding: '0.6rem 1rem',
+              background: !selectedPath ? 'var(--bg-card)' : 'var(--danger)',
+              border: 'none',
+              borderRadius: 4,
+              color: 'white',
+              cursor: !selectedPath ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Delete
+          </button>
+        </div>
+        <div>
           <label style={{ display: 'block', marginBottom: '0.25rem', fontSize: '0.85rem' }}>Rows to show</label>
           <select
             value={limit}
@@ -83,6 +128,9 @@ export default function DatasetBrowser() {
 
       {data && !loading && (
         <>
+          <p style={{ margin: '0 0 1rem', color: 'var(--text-muted)' }}>
+            Selected: <span style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{selectedDatasetName}</span>
+          </p>
           {/* Status Panel */}
           <div style={{
             display: 'grid',

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { models } from '../services/api'
 
 type ModelDetailData = {
   id: string
   classification_mode: string
   feature_mode: string
+  algorithm_label?: string | null
   feature_count: number
   feature_importance: Record<string, number>
   top_features: { name: string; importance: number }[]
@@ -16,8 +17,10 @@ type ModelDetailData = {
 
 export default function ModelDetail() {
   const { modelId } = useParams<{ modelId: string }>()
+  const navigate = useNavigate()
   const [detail, setDetail] = useState<ModelDetailData | null>(null)
   const [error, setError] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!modelId) return
@@ -31,10 +34,29 @@ export default function ModelDetail() {
 
   const maxImp = Math.max(...Object.values(detail.feature_importance), 0.001)
 
+  const handleDelete = async () => {
+    if (!detail) return
+    const label = detail.algorithm_label || detail.id
+    const ok = window.confirm(`Delete model "${label}"?\n\n${detail.id}`)
+    if (!ok) return
+    try {
+      setDeleting(true)
+      await models.delete(detail.id)
+      navigate('/models')
+    } catch {
+      setError('Delete failed')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div>
       <h1 style={{ margin: '0 0 1rem' }}>Model Detail</h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Model ID: {detail.id}</p>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+        {detail.algorithm_label ? `Algorithm: ${detail.algorithm_label} ` : null}
+        Model ID: {detail.id}
+      </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
@@ -99,6 +121,23 @@ export default function ModelDetail() {
         <a href={`/api/models/${detail.id}/download`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
           Download Model
         </a>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting}
+          style={{
+            padding: '0.5rem 1rem',
+            background: deleting ? 'var(--bg-card)' : 'var(--danger)',
+            border: 'none',
+            borderRadius: 4,
+            color: 'white',
+            cursor: deleting ? 'not-allowed' : 'pointer',
+            fontWeight: 600,
+            marginLeft: 'auto',
+          }}
+        >
+          {deleting ? 'Deleting...' : 'Delete Model'}
+        </button>
       </div>
     </div>
   )

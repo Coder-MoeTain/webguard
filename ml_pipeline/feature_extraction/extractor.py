@@ -4,7 +4,7 @@ Extract tabular features for Random Forest from raw records.
 """
 
 from pathlib import Path
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Callable
 
 import pandas as pd
 from tqdm import tqdm
@@ -30,7 +30,10 @@ class FeatureExtractor:
     ):
         self.feature_mode = feature_mode
         if feature_mode == "sqli_37":
-            self.feature_columns = SQLI_37_FEATURES
+            # In sqli_37 mode we still want a full payload feature set
+            # (SQLi + XSS + CSRF + common indicators), not only the 37 SQLi features.
+            payload_cols = FEATURE_GROUPS["payload_only"]
+            self.feature_columns = list(dict.fromkeys(SQLI_37_FEATURES + payload_cols))
         else:
             payload_cols = FEATURE_GROUPS["payload_only"]
             response_cols = FEATURE_GROUPS["response_only"]
@@ -49,6 +52,9 @@ class FeatureExtractor:
         features = {}
         if self.feature_mode == "sqli_37":
             features.update(extract_sqli_37_features(payload))
+            features.update(extract_xss_features(payload))
+            features.update(extract_csrf_features(payload, record))
+            features.update(extract_common_features(payload, record))
         else:
             features.update(extract_sqli_features(payload))
             features.update(extract_xss_features(payload))
@@ -75,6 +81,7 @@ class FeatureExtractor:
         output_path: str,
         format: str = "parquet",
         chunk_size: int = 50_000,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> str:
         """Extract features from file with chunked processing. Input must have a 'payload' column."""
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -96,6 +103,9 @@ class FeatureExtractor:
                 chunk_table = table.slice(i, min(chunk_size, total_rows - i))
                 chunk = chunk_table.to_pandas()
                 feat_df = self.extract_dataframe(chunk)
+                if progress_callback:
+                    written = min(i + len(chunk), total_rows)
+                    progress_callback(written, total_rows)
                 if first:
                     feat_df.to_parquet(output_path, index=False) if format == "parquet" else feat_df.to_csv(output_path, index=False)
                     first = False
@@ -105,6 +115,15 @@ class FeatureExtractor:
                     (combined.to_parquet(output_path, index=False) if format == "parquet" else combined.to_csv(output_path, index=False))
         else:
             first_chunk = True
+            total_rows = 0
+            # Best-effort line counting for progress percent (used for CSV).
+            try:
+                with open(input_path, "rb") as f:
+                    total_rows = sum(1 for _ in f) - 1  # subtract header line
+                total_rows = max(0, total_rows)
+            except Exception:
+                total_rows = 0
+            written_rows = 0
             for chunk in pd.read_csv(input_path, chunksize=chunk_size):
                 if first_chunk and "payload" not in chunk.columns:
                     raise ValueError(
@@ -113,6 +132,9 @@ class FeatureExtractor:
                     )
                 first_chunk = False
                 feat_df = self.extract_dataframe(chunk)
+                if progress_callback:
+                    written_rows += len(chunk)
+                    progress_callback(written_rows, total_rows)
                 if first:
                     feat_df.to_parquet(output_path, index=False) if format == "parquet" else feat_df.to_csv(output_path, index=False)
                     first = False

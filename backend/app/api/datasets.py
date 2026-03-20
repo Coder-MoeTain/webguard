@@ -160,6 +160,21 @@ def reset_datasets(user: dict = Depends(get_current_user)):
     return {"deleted": deleted, "count": len(deleted)}
 
 
+@router.delete("/delete")
+def delete_dataset(path: str, user: dict = Depends(get_current_user)):
+    """Delete a single dataset/feature file under DATA_DIR."""
+    resolved = validate_data_path(path)
+    if not resolved.exists():
+        raise HTTPException(404, "File not found")
+    if resolved.suffix not in (".parquet", ".csv"):
+        raise HTTPException(400, "Only .parquet and .csv files can be deleted")
+    try:
+        resolved.unlink()
+    except OSError as e:
+        raise HTTPException(500, f"Failed to delete file: {e}")
+    return {"deleted": [resolved.name], "path": path}
+
+
 @router.post("/upload")
 async def upload_dataset(file: UploadFile = File(...), user: dict = Depends(get_current_user)):
     if not file.filename or not (file.filename.endswith(".csv") or file.filename.endswith(".parquet")):

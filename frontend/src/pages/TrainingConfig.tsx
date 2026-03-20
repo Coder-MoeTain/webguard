@@ -204,7 +204,7 @@ export default function TrainingConfig() {
                 <option value="payload_only">Payload Only</option>
                 <option value="response_only">Response Only</option>
                 <option value="hybrid">Hybrid</option>
-                <option value="sqli_37">SQLi 37 Features</option>
+                <option value="sqli_37">SQLi 37 (Full Feature Set)</option>
               </select>
             </div>
           </div>
