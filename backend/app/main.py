@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     try:
         from .db import init_db
         if init_db():
-            logger.info("Database connected")
+            logger.info("Database connected (migrations run on startup if RUN_ALEMBIC_ON_STARTUP=true)")
         else:
             logger.info("Database not available, using file-based storage")
     except Exception as e:

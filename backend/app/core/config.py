@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = "password"
     DB_NAME: str = "webguard_rf"
     USE_DATABASE: bool = True
+    # When True and MySQL is reachable, run ``alembic upgrade head`` on startup before serving.
+    RUN_ALEMBIC_ON_STARTUP: bool = True
     REDIS_URL: str = "redis://localhost:6379/0"
     DATA_DIR: str = "./data"
     MODELS_DIR: str = "./models"

@@ -287,8 +287,11 @@ Key environment variables (see `.env.example`):
 | `ALLOWED_ORIGINS` | CORS origins (comma-separated) | `http://localhost:3000,...` |
 | `DB_HOST` | MySQL host | `localhost` |
 | `DB_NAME` | Database name | `webguard_rf` |
+| `RUN_ALEMBIC_ON_STARTUP` | Run `alembic upgrade head` when the API starts | `true` |
 | `DATA_DIR` | Dataset storage path | `./data` |
 | `MODELS_DIR` | Model storage path | `./models` |
+
+**Database migrations:** With `USE_DATABASE=true`, the API runs **`alembic upgrade head`** on startup (see `RUN_ALEMBIC_ON_STARTUP`). Migration scripts are under `alembic/versions/`. Manual commands and stamping an existing DB are documented in [`alembic/README.md`](alembic/README.md).
 
 ---
 

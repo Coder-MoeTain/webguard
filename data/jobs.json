@@ -3836,8 +3836,8 @@
     "n_estimators": 500
   },
   "62b96032-cce": {
-    "phase": "Hyperparameter tuning...",
-    "progress": 30,
+    "phase": "completed",
+    "progress": 100,
     "config": {
       "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
       "algorithm": "random_forest",
@@ -3854,13 +3854,555 @@
       "random_state": 42,
       "hyperparameter_tuning": true
     },
-    "step": "training",
+    "step": "complete",
     "detail": "Reading dataset",
     "samples_loaded": 5000999,
     "train_size": 3500699,
     "val_size": 750150,
     "test_size": 750150,
     "feature_count": 63,
-    "n_estimators": 500
+    "n_estimators": 500,
+    "train_time_seconds": 2372.6,
+    "model_id": "rf_1774067390",
+    "metrics": {
+      "train": {
+        "accuracy": 0.9600214128664019,
+        "precision_macro": 0.9600029747791411,
+        "recall_macro": 0.9487910338819281,
+        "f1_macro": 0.9540477510678212,
+        "f1_weighted": 0.9598594481947447,
+        "roc_auc": 0.9692956474862962,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            336128,
+            13858,
+            14075,
+            13824
+          ],
+          [
+            4708,
+            1008234,
+            14418,
+            13933
+          ],
+          [
+            4684,
+            13925,
+            1008151,
+            14013
+          ],
+          [
+            4646,
+            13956,
+            13913,
+            1008233
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9599104424758543,
+            "recall": 0.8894981277372745,
+            "f1": 0.9233638852223265
+          },
+          "sqli": {
+            "precision": 0.9602475492226943,
+            "recall": 0.9682519713471617,
+            "f1": 0.9642331487242656
+          },
+          "xss": {
+            "precision": 0.9596347461394289,
+            "recall": 0.9686559893463801,
+            "f1": 0.9641242654196134
+          },
+          "csrf": {
+            "precision": 0.9602191612785869,
+            "recall": 0.9687580470968957,
+            "f1": 0.9644697049050796
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9602626141438378,
+        "precision_macro": 0.9601319404430215,
+        "recall_macro": 0.9490387851889678,
+        "f1_macro": 0.9542431281708285,
+        "f1_weighted": 0.9601009798376438,
+        "roc_auc": 0.9676752472503184,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            72050,
+            3042,
+            2916,
+            2967
+          ],
+          [
+            1019,
+            216139,
+            2922,
+            3055
+          ],
+          [
+            1048,
+            3016,
+            216043,
+            2915
+          ],
+          [
+            976,
+            2980,
+            2953,
+            216109
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.959476915291705,
+            "recall": 0.8897807965421426,
+            "f1": 0.9233154778686213
+          },
+          "sqli": {
+            "precision": 0.9598626857982832,
+            "recall": 0.9686467833374415,
+            "f1": 0.9642347293848926
+          },
+          "xss": {
+            "precision": 0.9609000418086232,
+            "recall": 0.9687071230640923,
+            "f1": 0.9647877889321568
+          },
+          "csrf": {
+            "precision": 0.9602881188734748,
+            "recall": 0.9690204378121945,
+            "f1": 0.9646345164976432
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.959878690928481,
+        "precision_macro": 0.9600074380935592,
+        "recall_macro": 0.948409522254526,
+        "f1_macro": 0.9538350198373747,
+        "f1_weighted": 0.9597095507154736,
+        "roc_auc": 0.9671730875308296,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            71895,
+            2997,
+            3020,
+            3064
+          ],
+          [
+            941,
+            216098,
+            3019,
+            3076
+          ],
+          [
+            1017,
+            3067,
+            215944,
+            2995
+          ],
+          [
+            987,
+            2988,
+            2926,
+            216116
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9606493853554249,
+            "recall": 0.8878556609365738,
+            "f1": 0.9228192226728963
+          },
+          "sqli": {
+            "precision": 0.9597956917610482,
+            "recall": 0.9684673783466438,
+            "f1": 0.9641120361199597
+          },
+          "xss": {
+            "precision": 0.9601394341711537,
+            "recall": 0.9682588791290584,
+            "f1": 0.9641820633489012
+          },
+          "csrf": {
+            "precision": 0.95944524108661,
+            "recall": 0.9690561706058283,
+            "f1": 0.9642267572077418
+          }
+        }
+      },
+      "train_time_seconds": 2372.5958049297333,
+      "feature_importance": {
+        "has_select": 0.009620520682302616,
+        "has_union": 0.0030052622710430507,
+        "has_sleep": 0.0003777729533048775,
+        "has_or_1_equals_1": 0.0012491702646924203,
+        "has_drop": 0.00014536786798867758,
+        "has_insert": 0.00030352539711852667,
+        "has_delete": 0.0005256098187264454,
+        "has_update": 0.0004522685797647009,
+        "has_information_schema": 0.0005719064889907992,
+        "has_where": 0.00021751033818551924,
+        "has_order_by": 0.00013868607650096735,
+        "has_group_by": 6.01597187678694e-05,
+        "has_having": 2.7536655162599006e-05,
+        "has_like": 0.0006686957532066322,
+        "has_in": 4.981322937858167e-05,
+        "has_hex": 0.003462048763968193,
+        "has_char": 0.002076760517878395,
+        "has_concat": 0.0019242481607483163,
+        "has_ascii": 0.0,
+        "has_substring": 0.00013615519576855032,
+        "has_count": 4.079911602149458e-05,
+        "has_benchmark": 0.00024568222641154955,
+        "has_waitfor": 0.0002941613319312371,
+        "has_exec": 0.0003483021911118906,
+        "has_xp_cmdshell": 0.0007957778685831215,
+        "quote_count": 0.05725257886511619,
+        "comment_marker_count": 0.05610739643237702,
+        "semicolon_count": 0.005069753883894533,
+        "equals_count": 0.015108606077023,
+        "parentheses_count": 0.05183020833376082,
+        "keyword_density": 0.033536619542603896,
+        "sqli_entropy": 0.02787471358927167,
+        "payload_length": 0.017615549362481282,
+        "special_char_ratio": 0.04383307958649362,
+        "encoded_char_ratio": 0.013092689139045682,
+        "logical_op_count": 0.022193587026140934,
+        "comparison_count": 0.024118347567417844,
+        "has_script_tag": 0.005775776705160635,
+        "has_javascript_protocol": 0.004860494461834835,
+        "has_onerror": 0.0037876815387326277,
+        "has_onload": 0.0005836870794597574,
+        "has_alert": 0.06622089522840353,
+        "has_document_write": 9.92505762847756e-05,
+        "has_eval": 0.0,
+        "html_tag_count": 0.02611771614628788,
+        "angle_bracket_count": 0.024905925338999182,
+        "encoded_js_pattern": 0.00281913935304085,
+        "suspicious_dom_keywords": 0.004149166638382142,
+        "svg_script_count": 0.0015300286301630451,
+        "missing_csrf_token": 0.06097271837890581,
+        "invalid_csrf_token": 0.027821660780274163,
+        "cross_origin_flag": 0.006979856652690331,
+        "missing_referer": 0.0,
+        "state_change_request": 0.05860443122888046,
+        "suspicious_cookie_usage": 0.0,
+        "same_site_violation": 0.004038031078264514,
+        "request_method_get": 0.06387253966508119,
+        "request_method_post": 0.04188884375048872,
+        "url_length": 0.05700290280711112,
+        "number_count": 0.026352098379231643,
+        "whitespace_ratio": 0.0506681240605398,
+        "has_cookies": 0.06657816064859928,
+        "has_referer": 0.0
+      },
+      "model_path": "models\\rf_1774067390.joblib",
+      "preprocessor_path": "models\\rf_1774067390_preprocessor.joblib",
+      "model_id": "rf_1774067390",
+      "algorithm": "random_forest",
+      "algorithm_label": "Random Forest (sklearn)",
+      "config": {
+        "algorithm": "random_forest",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 63,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "e6507fcd-338": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "logistic_regression",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "train_time_seconds": 782.75,
+    "model_id": "rf_1774068414",
+    "metrics": {
+      "train": {
+        "accuracy": 0.9532441949450667,
+        "precision_macro": 0.9442106717127771,
+        "recall_macro": 0.943225231257907,
+        "f1_macro": 0.9436901808015973,
+        "f1_weighted": 0.9531895451172756,
+        "roc_auc": 0.9672101760001308,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            336437,
+            13549,
+            14075,
+            13824
+          ],
+          [
+            28742,
+            984200,
+            14418,
+            13933
+          ],
+          [
+            5003,
+            13606,
+            1008151,
+            14013
+          ],
+          [
+            4984,
+            13618,
+            13913,
+            1008233
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.8967683638709265,
+            "recall": 0.8903158368286648,
+            "f1": 0.8935304514568071
+          },
+          "sqli": {
+            "precision": 0.960220415562166,
+            "recall": 0.9451710517596872,
+            "f1": 0.9526363014248892
+          },
+          "xss": {
+            "precision": 0.9596347461394289,
+            "recall": 0.9686559893463801,
+            "f1": 0.9641242654196134
+          },
+          "csrf": {
+            "precision": 0.9602191612785869,
+            "recall": 0.9687580470968957,
+            "f1": 0.9644697049050796
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9535026328067719,
+        "precision_macro": 0.9443532727673394,
+        "recall_macro": 0.9435224729798047,
+        "f1_macro": 0.94391330000078,
+        "f1_weighted": 0.9534523945343869,
+        "roc_auc": 0.9673747803553512,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            72134,
+            2958,
+            2916,
+            2967
+          ],
+          [
+            6174,
+            210984,
+            2922,
+            3055
+          ],
+          [
+            1128,
+            2936,
+            216043,
+            2915
+          ],
+          [
+            1045,
+            2911,
+            2953,
+            216109
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.8962860799443347,
+            "recall": 0.8908181537511578,
+            "f1": 0.8935437518580913
+          },
+          "sqli": {
+            "precision": 0.9599388504429248,
+            "recall": 0.9455441772917741,
+            "f1": 0.9526871427152288
+          },
+          "xss": {
+            "precision": 0.9609000418086232,
+            "recall": 0.9687071230640923,
+            "f1": 0.9647877889321568
+          },
+          "csrf": {
+            "precision": 0.9602881188734748,
+            "recall": 0.9690204378121945,
+            "f1": 0.9646345164976432
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.9529494101179764,
+        "precision_macro": 0.9438206756587969,
+        "recall_macro": 0.9427154850115923,
+        "f1_macro": 0.9432395628144178,
+        "f1_weighted": 0.9528904409443042,
+        "roc_auc": 0.9669229516083798,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            71961,
+            2931,
+            3020,
+            3064
+          ],
+          [
+            6205,
+            210834,
+            3019,
+            3076
+          ],
+          [
+            1093,
+            2991,
+            215944,
+            2995
+          ],
+          [
+            1062,
+            2913,
+            2926,
+            216116
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.8959176305075883,
+            "recall": 0.8886707172495554,
+            "f1": 0.8922794596303713
+          },
+          "sqli": {
+            "precision": 0.959780396869836,
+            "recall": 0.944876173061927,
+            "f1": 0.9522699710706567
+          },
+          "xss": {
+            "precision": 0.9601394341711537,
+            "recall": 0.9682588791290584,
+            "f1": 0.9641820633489012
+          },
+          "csrf": {
+            "precision": 0.95944524108661,
+            "recall": 0.9690561706058283,
+            "f1": 0.9642267572077418
+          }
+        }
+      },
+      "train_time_seconds": 782.748605966568,
+      "feature_importance": {
+        "has_select": 0.02160768449576586,
+        "has_union": 0.017399139330377254,
+        "has_sleep": 0.0176392651749064,
+        "has_or_1_equals_1": 0.0051594325191142,
+        "has_drop": 0.03287325557077942,
+        "has_insert": 0.0245907518685646,
+        "has_delete": 0.027422055391584852,
+        "has_update": 0.02130997574869006,
+        "has_information_schema": 0.023397635672654436,
+        "has_where": 0.014525635749799889,
+        "has_order_by": 0.0020536197875243804,
+        "has_group_by": 0.01582921666060851,
+        "has_having": 0.0021514022176184486,
+        "has_like": 0.0038171512600029423,
+        "has_in": 0.0025675605253585487,
+        "has_hex": 0.0056461297758659875,
+        "has_char": 0.02624082522397369,
+        "has_concat": 0.029439419894830142,
+        "has_ascii": 0.0,
+        "has_substring": 0.003483018047294035,
+        "has_count": 0.015486532532569092,
+        "has_benchmark": 0.011988242555940947,
+        "has_waitfor": 0.025840162697653556,
+        "has_exec": 0.014569903940379936,
+        "has_xp_cmdshell": 0.02161373520055505,
+        "quote_count": 0.00584249876694551,
+        "comment_marker_count": 0.02763650247053532,
+        "semicolon_count": 0.016344202828213313,
+        "equals_count": 0.0028744053566666363,
+        "parentheses_count": 0.006273701018661931,
+        "keyword_density": 0.011147794873392658,
+        "sqli_entropy": 0.024217303350801887,
+        "payload_length": 0.0006732762432839482,
+        "special_char_ratio": 0.04877397766840939,
+        "encoded_char_ratio": 0.03098617534969973,
+        "logical_op_count": 0.02807568065868325,
+        "comparison_count": 0.0021136883463938132,
+        "has_script_tag": 0.014243097971088187,
+        "has_javascript_protocol": 0.008611992329944132,
+        "has_onerror": 0.048076927089464636,
+        "has_onload": 0.004810569753488779,
+        "has_alert": 0.030679570033337652,
+        "has_document_write": 0.025064079979014227,
+        "has_eval": 0.0,
+        "html_tag_count": 0.0010565712007415903,
+        "angle_bracket_count": 0.0021131424014831806,
+        "encoded_js_pattern": 0.02388924578922015,
+        "suspicious_dom_keywords": 0.025785470253947666,
+        "svg_script_count": 0.017013817303911095,
+        "missing_csrf_token": 0.016799429507195568,
+        "invalid_csrf_token": 0.011613242627548164,
+        "cross_origin_flag": 0.031116033650157537,
+        "missing_referer": 0.0,
+        "state_change_request": 0.016799429507195568,
+        "suspicious_cookie_usage": 0.0,
+        "same_site_violation": 0.013492032794493111,
+        "request_method_get": 0.020960614333303915,
+        "request_method_post": 0.016799429507195568,
+        "url_length": 0.0004911024676853885,
+        "number_count": 0.0028191220366250106,
+        "whitespace_ratio": 0.03407492507027194,
+        "has_cookies": 0.020960614333303915,
+        "has_referer": 0.021118581282757207
+      },
+      "model_path": "models\\rf_1774068414.joblib",
+      "preprocessor_path": "models\\rf_1774068414_preprocessor.joblib",
+      "model_id": "rf_1774068414",
+      "algorithm": "logistic_regression",
+      "algorithm_label": "Logistic Regression",
+      "config": {
+        "algorithm": "logistic_regression",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 63,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
   }
 }
