@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any
 
 from ..core.config import settings
 from ..core.deps import get_current_user
+from ..core.http_context import request_context_flags
 
 router = APIRouter()
 
@@ -37,13 +38,14 @@ class InferenceResponse(BaseModel):
 
 def _build_record(req: InferenceRequest) -> dict:
     payload = req.body or req.query_params or req.url or ""
+    ctx = request_context_flags(req.headers)
     return {
         "payload": payload,
         "request_method": req.request_method,
         "url": req.url or "https://example.com/",
-        "cookies_present": bool(req.headers and "Cookie" in str(req.headers)),
-        "token_present": bool(req.headers and any("csrf" in k.lower() or "token" in k.lower() for k in (req.headers or {}))),
-        "referrer_present": bool(req.headers and "Referer" in str(req.headers)),
+        "cookies_present": ctx["cookies_present"],
+        "token_present": ctx["token_present"],
+        "referrer_present": ctx["referrer_present"],
         "response_status": req.response_status or 200,
         "response_length": req.response_length or 1000,
         "response_time": req.response_time or 100.0,

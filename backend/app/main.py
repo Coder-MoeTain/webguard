@@ -51,6 +51,13 @@ app.add_middleware(
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
+    # CORS preflight should not consume quota (browser sends OPTIONS per endpoint).
+    if request.method == "OPTIONS":
+        return await call_next(request)
+    path = request.url.path
+    if path in ("/docs", "/redoc", "/openapi.json") or path.startswith("/api/docs"):
+        return await call_next(request)
+
     client = request.client.host if request.client else "unknown"
     if not check_rate_limit(client, limit=settings.RATE_LIMIT_PER_MINUTE):
         return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})

@@ -13,6 +13,10 @@ interface Alert {
   source_ip: string
   severity: string
   top_indicators: string[]
+  second_best?: string | null
+  second_confidence?: number | null
+  confidence_margin?: number | null
+  uncertain?: boolean
 }
 
 interface Stats {
@@ -23,15 +27,57 @@ interface Stats {
   attack_rate?: number
 }
 
-const TRAFFIC_SAMPLES = [
+type TrafficSample = {
+  type: string
+  payload: string
+  method?: string
+  url?: string
+  /** Send payload in body (e.g. POST) */
+  useBody?: boolean
+  /** Align HTTP context with CSRF-labeled training rows */
+  request_context_profile?: 'csrf_attack'
+}
+
+const TRAFFIC_SAMPLES: TrafficSample[] = [
   { type: 'sqli', payload: "' OR 1=1--" },
   { type: 'sqli', payload: "admin'--" },
-  { type: 'xss', payload: "<script>alert(1)</script>" },
-  { type: 'xss', payload: "<img onerror=alert(1)>" },
-  { type: 'csrf', payload: "POST /transfer (no token)" },
-  { type: 'benign', payload: "laptop" },
-  { type: 'benign', payload: "user@email.com" },
+  { type: 'xss', payload: '<script>alert(1)</script>' },
+  { type: 'xss', payload: '<img onerror=alert(1)>' },
+  {
+    type: 'csrf',
+    payload: 'amount=1000&to=attacker',
+    method: 'POST',
+    url: '/api/transfer',
+    useBody: true,
+    request_context_profile: 'csrf_attack',
+  },
+  { type: 'benign', payload: 'laptop' },
+  { type: 'benign', payload: 'user@email.com' },
 ]
+
+function buildAnalyzePayload(sample: TrafficSample, modelId: string | undefined) {
+  const body: {
+    model_id?: string
+    method?: string
+    url?: string
+    body?: string
+    query_params?: string
+    request_context_profile?: 'csrf_attack'
+  } = {
+    model_id: modelId || undefined,
+    method: sample.method ?? 'GET',
+    url: sample.url ?? '/search',
+  }
+  if (sample.useBody) {
+    body.body = sample.payload
+  } else {
+    body.query_params = sample.payload
+  }
+  if (sample.request_context_profile) {
+    body.request_context_profile = sample.request_context_profile
+  }
+  return body
+}
 
 export default function IDSDashboard() {
   const [modelList, setModelList] = useState<{ id: string; algorithm_label?: string }[]>([])
@@ -39,7 +85,16 @@ export default function IDSDashboard() {
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [testPayload, setTestPayload] = useState("' OR 1=1--")
-  const [lastResult, setLastResult] = useState<{ prediction: string; confidence: number; alert_raised: boolean } | null>(null)
+  const [testCsrfContext, setTestCsrfContext] = useState(false)
+  const [lastResult, setLastResult] = useState<{
+    prediction: string
+    confidence: number
+    alert_raised: boolean
+    second_best?: string | null
+    second_confidence?: number | null
+    confidence_margin?: number
+    uncertain?: boolean
+  } | null>(null)
   const [simulatorRunning, setSimulatorRunning] = useState(false)
   const simulatorRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -69,16 +124,30 @@ export default function IDSDashboard() {
   const runTest = async () => {
     setLastResult(null)
     try {
-      const { data } = await ids.analyze({
-        method: 'GET',
-        url: '/search',
-        query_params: testPayload,
-        model_id: modelId || undefined,
-      })
+      const { data } = await ids.analyze(
+        testCsrfContext
+          ? {
+              method: 'POST',
+              url: '/api/transfer',
+              body: testPayload,
+              model_id: modelId || undefined,
+              request_context_profile: 'csrf_attack',
+            }
+          : {
+              method: 'GET',
+              url: '/search',
+              query_params: testPayload,
+              model_id: modelId || undefined,
+            },
+      )
       setLastResult({
         prediction: data.prediction,
         confidence: data.confidence,
         alert_raised: data.alert_raised,
+        second_best: data.second_best,
+        second_confidence: data.second_confidence,
+        confidence_margin: data.confidence_margin,
+        uncertain: data.uncertain,
       })
       fetchData()
     } catch {
@@ -92,12 +161,7 @@ export default function IDSDashboard() {
     simulatorRef.current = setInterval(async () => {
       const sample = TRAFFIC_SAMPLES[Math.floor(Math.random() * TRAFFIC_SAMPLES.length)]
       try {
-        await ids.analyze({
-          method: 'GET',
-          url: '/search',
-          query_params: sample.payload,
-          model_id: modelId || undefined,
-        })
+        await ids.analyze(buildAnalyzePayload(sample, modelId || undefined))
         fetchData()
       } catch {}
     }, 2500)
@@ -219,6 +283,10 @@ export default function IDSDashboard() {
               Analyze
             </button>
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', cursor: 'pointer', marginBottom: '0.5rem' }}>
+            <input type="checkbox" checked={testCsrfContext} onChange={(e) => setTestCsrfContext(e.target.checked)} />
+            CSRF context (POST + session cookie, no CSRF token / referer)
+          </label>
           {lastResult && (
             <div style={{
               marginTop: '0.75rem',
@@ -227,8 +295,24 @@ export default function IDSDashboard() {
               borderRadius: 4,
               border: `1px solid ${lastResult.prediction !== 'benign' ? 'var(--danger)' : 'var(--success)'}`,
             }}>
-              <strong>{lastResult.prediction}</strong> ({(lastResult.confidence * 100).toFixed(1)}%)
-              {lastResult.alert_raised && ' — Alert raised'}
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
+                <strong>{lastResult.prediction}</strong>
+                <span>({(lastResult.confidence * 100).toFixed(1)}%)</span>
+                {lastResult.uncertain && (
+                  <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.45rem', borderRadius: 999, background: 'var(--warning)', color: 'var(--bg-primary)', fontWeight: 600 }}>
+                    Low certainty
+                  </span>
+                )}
+                {lastResult.alert_raised && <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>— Alert raised</span>}
+              </div>
+              {lastResult.second_best != null && lastResult.second_confidence != null && (
+                <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Runner-up: <strong style={{ color: 'var(--text)' }}>{lastResult.second_best}</strong> ({(lastResult.second_confidence * 100).toFixed(1)}%)
+                  {lastResult.confidence_margin != null && (
+                    <> · Margin Δ{(lastResult.confidence_margin * 100).toFixed(1)}%</>
+                  )}
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -236,7 +320,7 @@ export default function IDSDashboard() {
         <div style={{ background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
           <h3 style={{ margin: '0 0 1rem', fontSize: '1rem' }}>Traffic Simulator</h3>
           <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Generate simulated attack traffic to test the IDS in real-time.
+            Random mix of SQLi, XSS, CSRF-style POST (missing CSRF token context), and benign strings. Alerts show runner-up class and margin when the model is unsure.
           </p>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
@@ -302,6 +386,7 @@ export default function IDSDashboard() {
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Time</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Type</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Confidence</th>
+                  <th style={{ textAlign: 'left', padding: '0.5rem' }}>2nd / Δ</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Method</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Payload</th>
                   <th style={{ textAlign: 'left', padding: '0.5rem' }}>Source</th>
@@ -309,14 +394,39 @@ export default function IDSDashboard() {
               </thead>
               <tbody>
                 {alerts.map((a) => (
-                  <tr key={a.id} style={{ borderBottom: '1px solid var(--bg-card)' }}>
+                  <tr
+                    key={a.id}
+                    style={{
+                      borderBottom: '1px solid var(--bg-card)',
+                      opacity: a.uncertain ? 0.92 : 1,
+                    }}
+                  >
                     <td style={{ padding: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       {new Date(a.timestamp * 1000).toLocaleTimeString()}
                     </td>
                     <td style={{ padding: '0.5rem' }}>
-                      <span style={{ color: severityColor[a.severity] || 'var(--text)' }}>{a.prediction}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                        <span style={{ color: severityColor[a.severity] || 'var(--text)' }}>{a.prediction}</span>
+                        {a.uncertain && (
+                          <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.35rem', borderRadius: 4, background: 'rgba(251,191,36,0.35)', color: 'var(--text)', fontWeight: 600 }}>
+                            ?
+                          </span>
+                        )}
+                      </span>
                     </td>
                     <td style={{ padding: '0.5rem' }}>{(a.confidence * 100).toFixed(1)}%</td>
+                    <td style={{ padding: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: 140 }}>
+                      {a.second_best != null && a.second_confidence != null ? (
+                        <>
+                          {a.second_best} {(a.second_confidence * 100).toFixed(0)}%
+                          {a.confidence_margin != null && (
+                            <> · Δ{(a.confidence_margin * 100).toFixed(0)}%</>
+                          )}
+                        </>
+                      ) : (
+                        '—'
+                      )}
+                    </td>
                     <td style={{ padding: '0.5rem' }}>{a.method}</td>
                     <td style={{ padding: '0.5rem', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }} title={a.payload_preview}>
                       <code style={{ fontSize: '0.8rem' }}>{a.payload_preview.slice(0, 40)}{a.payload_preview.length > 40 ? '...' : ''}</code>

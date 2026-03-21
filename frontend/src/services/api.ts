@@ -91,8 +91,16 @@ export const reports = {
 }
 
 export const ids = {
-  analyze: (data: { method?: string; url?: string; body?: string; query_params?: string; model_id?: string }) =>
-    api.post('/ids/analyze', data),
+  analyze: (data: {
+    method?: string
+    url?: string
+    body?: string
+    query_params?: string
+    headers?: Record<string, string>
+    model_id?: string
+    /** Session cookie but no CSRF token / no referer — use for CSRF-style simulator traffic */
+    request_context_profile?: 'default' | 'csrf_attack'
+  }) => api.post('/ids/analyze', data),
   alerts: (params?: { limit?: number; since?: number }) => api.get('/ids/alerts', { params }),
   stats: () => api.get('/ids/stats'),
   clear: () => api.post('/ids/clear'),

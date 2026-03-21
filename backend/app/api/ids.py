@@ -4,7 +4,7 @@ WebGuard RF - Real-time IDS API
 
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 
 import joblib
 from fastapi import APIRouter, Depends, Request, HTTPException
@@ -15,6 +15,7 @@ import time
 
 from ..core.config import settings
 from ..core.deps import get_current_user
+from ..core.http_context import resolve_request_context
 from ..services.ids_engine import add_alert, get_alerts, get_stats, clear_alerts
 
 router = APIRouter()
@@ -62,6 +63,8 @@ class AnalyzeRequest(BaseModel):
     query_params: Optional[str] = None
     headers: Optional[Dict[str, str]] = None
     model_id: Optional[str] = None
+    # default: browser-like defaults when headers omitted; csrf_attack: session cookie, no CSRF token, no referer
+    request_context_profile: Optional[Literal["default", "csrf_attack"]] = None
 
 
 @router.post("/analyze")
@@ -78,13 +81,17 @@ def analyze_request(req: AnalyzeRequest, request: Request, user: dict = Depends(
         label_map_inv = {0: "benign", 1: "attack"}
 
     payload = req.body or (str(req.query_params) if req.query_params else "") or ""
+    ctx = resolve_request_context(
+        req.headers,
+        "csrf_attack" if req.request_context_profile == "csrf_attack" else None,
+    )
     record = {
         "payload": payload,
         "request_method": req.method or "GET",
         "url": req.url or "/",
-        "cookies_present": bool(req.headers and "Cookie" in str(req.headers)),
-        "token_present": bool(req.headers and any("csrf" in k.lower() or "token" in k.lower() for k in (req.headers or {}))),
-        "referrer_present": bool(req.headers and "Referer" in str(req.headers)),
+        "cookies_present": ctx["cookies_present"],
+        "token_present": ctx["token_present"],
+        "referrer_present": ctx["referrer_present"],
         "response_status": 200,
         "response_length": 1000,
         "response_time": 100.0,
@@ -101,11 +108,28 @@ def analyze_request(req: AnalyzeRequest, request: Request, user: dict = Depends(
             df[c] = 0
     df = df[feature_columns].fillna(0)
 
-    pred_raw = model.predict(df)
-    pred = int(pred_raw[0]) if hasattr(pred_raw, "__getitem__") else int(pred_raw)
-    proba = model.predict_proba(df)[0]
-    conf = float(max(proba))
-    pred_label = label_map_inv.get(int(pred), "unknown")
+    import numpy as np
+
+    proba_arr = np.asarray(model.predict_proba(df)[0], dtype=float).ravel()
+    if hasattr(model, "classes_") and len(model.classes_) == len(proba_arr):
+        cls_list = [int(x) for x in model.classes_]
+    else:
+        cls_list = sorted(label_map_inv.keys())
+        if len(cls_list) != len(proba_arr):
+            cls_list = list(range(len(proba_arr)))
+
+    pairs: list[tuple[str, float]] = []
+    for idx, p in enumerate(proba_arr):
+        cid = cls_list[idx] if idx < len(cls_list) else idx
+        pairs.append((label_map_inv.get(int(cid), str(cid)), float(p)))
+    pairs.sort(key=lambda x: -x[1])
+
+    pred_label = pairs[0][0]
+    conf = pairs[0][1]
+    second_best = pairs[1][0] if len(pairs) > 1 else None
+    second_confidence = float(pairs[1][1]) if len(pairs) > 1 else None
+    margin = conf - (second_confidence or 0.0)
+    uncertain = bool(conf < 0.55 or margin < 0.12)
 
     if hasattr(model, "feature_importances_"):
         imp = model.feature_importances_
@@ -130,15 +154,24 @@ def analyze_request(req: AnalyzeRequest, request: Request, user: dict = Depends(
         payload_preview=payload[:200] if payload else "(empty)",
         source_ip=client_ip,
         top_indicators=top_indicators,
+        second_best=second_best,
+        second_confidence=second_confidence,
+        confidence_margin=margin,
+        uncertain=uncertain,
     )
 
     return {
         "prediction": pred_label,
         "confidence": conf,
+        "second_best": second_best,
+        "second_confidence": second_confidence,
+        "confidence_margin": margin,
+        "uncertain": uncertain,
         "is_attack": pred_label != "benign",
         "alert_raised": alert is not None,
         "alert_id": alert.id if alert else None,
         "top_indicators": top_indicators,
+        "request_context_profile": req.request_context_profile or "default",
     }
 
 

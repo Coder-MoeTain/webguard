@@ -28,7 +28,8 @@ class Settings(BaseSettings):
     UPLOAD_MAX_SIZE_MB: int = 500
     BCRYPT_ROUNDS: int = 12
     JWT_EXPIRE_MINUTES: int = 60
-    RATE_LIMIT_PER_MINUTE: int = 100
+    # IDS dashboard polls alerts+stats every ~2s + simulator; 100/min hit 429 with CORS traffic
+    RATE_LIMIT_PER_MINUTE: int = 600
     DEFAULT_N_ESTIMATORS: int = 200
     DEFAULT_MAX_DEPTH: int = 30
     DEFAULT_RANDOM_STATE: int = 42

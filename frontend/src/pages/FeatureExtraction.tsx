@@ -22,8 +22,8 @@ type PreviewData = {
 
 export default function FeatureExtraction() {
   const [datasetList, setDatasetList] = useState<{ path: string; name: string }[]>([])
-  const DEFAULT_INPUT_PATH = 'data/sample_dataset.parquet'
-  const [inputPath, setInputPath] = useState(DEFAULT_INPUT_PATH)
+  /** No hardcoded path — first dataset from API is selected when the list loads. */
+  const [inputPath, setInputPath] = useState('')
   const [featureMode, setFeatureMode] = useState<'payload_only' | 'response_only' | 'hybrid' | 'sqli_37'>('payload_only')
   const [result, setResult] = useState<{ job_id?: string; output_path?: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -41,11 +41,9 @@ export default function FeatureExtraction() {
       .then(({ data }) => {
         const list = data.datasets || []
         setDatasetList(list)
-        // Avoid "data/sample_dataset.parquet not found" by auto-selecting the first available dataset.
         if (list.length) {
-          const stillDefault = inputPath === DEFAULT_INPUT_PATH
           const isValidSelection = list.some((d: { path: string }) => d.path === inputPath)
-          if (stillDefault || !isValidSelection) setInputPath(list[0].path)
+          if (!inputPath || !isValidSelection) setInputPath(list[0].path)
         }
       })
       .catch(() => {})
@@ -123,6 +121,10 @@ export default function FeatureExtraction() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!inputPath) {
+      setResult({ output_path: 'Select an input dataset first.' })
+      return
+    }
     setResult(null)
     setExtractStatus(null)
     setPreview(null)
@@ -177,11 +179,16 @@ export default function FeatureExtraction() {
             <select
               value={inputPath}
               onChange={(e) => setInputPath(e.target.value)}
+              disabled={!datasetList.length}
               style={{ width: '100%', padding: '0.6rem', background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 4, color: 'var(--text)' }}
             >
-              {datasetList.length ? datasetList.map((d) => (
-                <option key={d.path} value={d.path}>{d.name}</option>
-              )) : <option value={inputPath}>{inputPath}</option>}
+              {!datasetList.length ? (
+                <option value="">No datasets available</option>
+              ) : (
+                datasetList.map((d) => (
+                  <option key={d.path} value={d.path}>{d.name}</option>
+                ))
+              )}
             </select>
           </div>
           <div style={{ marginBottom: '1rem' }}>
@@ -197,7 +204,20 @@ export default function FeatureExtraction() {
               <option value="sqli_37">SQLi 37 (Full Feature Set)</option>
             </select>
           </div>
-          <button type="submit" style={{ padding: '0.75rem 1.5rem', background: 'var(--accent)', border: 'none', borderRadius: 4, color: 'var(--bg-primary)', fontWeight: 600 }}>
+          <button
+            type="submit"
+            disabled={!inputPath || !datasetList.length}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'var(--accent)',
+              border: 'none',
+              borderRadius: 4,
+              color: 'var(--bg-primary)',
+              fontWeight: 600,
+              cursor: !inputPath || !datasetList.length ? 'not-allowed' : 'pointer',
+              opacity: !inputPath || !datasetList.length ? 0.6 : 1,
+            }}
+          >
             Extract Features
           </button>
         </form>

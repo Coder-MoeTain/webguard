@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from 'recharts'
 import { Cpu, HardDrive, Gauge, Activity, Settings, ChevronRight, AlertCircle } from 'lucide-react'
 import { training, system } from '../services/api'
@@ -352,8 +353,17 @@ export default function TrainingMonitor() {
                 <BarChart data={accuracyChartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                   <XAxis dataKey="split" stroke="var(--text-muted)" tick={{ fill: 'var(--text)' }} />
                   <YAxis stroke="var(--text-muted)" domain={[0, 100]} tick={{ fill: 'var(--text-muted)' }} />
-                  <Tooltip contentStyle={{ background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 8 }} formatter={(v: number) => [`${v.toFixed(2)}%`, 'Accuracy']} />
+                  <Tooltip
+                    contentStyle={{ background: 'var(--bg-primary)', border: '1px solid var(--bg-card)', borderRadius: 8 }}
+                    formatter={(v: number) => [`${v.toFixed(2)}%`, 'Accuracy']}
+                  />
                   <Bar dataKey="accuracy" radius={[4, 4, 0, 0]}>
+                    <LabelList
+                      dataKey="accuracy"
+                      position="insideTop"
+                      formatter={(v: number) => `${Number(v).toFixed(1)}%`}
+                      style={{ fill: '#ffffff', fontSize: 13, fontWeight: 700 }}
+                    />
                     {accuracyChartData.map((entry, i) => (
                       <Cell key={i} fill={entry.fill} />
                     ))}

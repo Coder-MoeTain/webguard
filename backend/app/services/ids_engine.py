@@ -23,6 +23,11 @@ class IDSAlert:
     source_ip: str
     severity: str  # low, medium, high, critical
     top_indicators: list
+    # Multiclass diagnostics (runner-up + margin for analyst review)
+    second_best: Optional[str] = None
+    second_confidence: Optional[float] = None
+    confidence_margin: Optional[float] = None
+    uncertain: bool = False
 
 
 _alert_store: list[IDSAlert] = []
@@ -50,6 +55,10 @@ def add_alert(
     payload_preview: str,
     source_ip: str = "unknown",
     top_indicators: Optional[list] = None,
+    second_best: Optional[str] = None,
+    second_confidence: Optional[float] = None,
+    confidence_margin: Optional[float] = None,
+    uncertain: bool = False,
 ) -> Optional[IDSAlert]:
     """Add alert when attack detected. Returns alert if attack, None if benign."""
     _stats["total_analyzed"] += 1
@@ -59,6 +68,13 @@ def add_alert(
         return None
 
     _stats["attacks_detected"] += 1
+    sev = _get_severity(prediction, confidence)
+    if uncertain and prediction.lower() != "benign":
+        # Downgrade visual severity when the model is split between classes
+        if sev == "critical":
+            sev = "medium"
+        elif sev == "high":
+            sev = "medium"
     alert = IDSAlert(
         id=f"alert_{int(time.time() * 1000)}_{len(_alert_store)}",
         timestamp=time.time(),
@@ -68,8 +84,12 @@ def add_alert(
         url=url,
         payload_preview=payload_preview[:200] + ("..." if len(payload_preview) > 200 else ""),
         source_ip=source_ip,
-        severity=_get_severity(prediction, confidence),
+        severity=sev,
         top_indicators=top_indicators or [],
+        second_best=second_best,
+        second_confidence=second_confidence,
+        confidence_margin=confidence_margin,
+        uncertain=uncertain,
     )
     _alert_store.append(alert)
     while len(_alert_store) > _max_alerts:
@@ -94,6 +114,10 @@ def get_alerts(limit: int = 50, since: Optional[float] = None) -> list[dict]:
             "source_ip": a.source_ip,
             "severity": a.severity,
             "top_indicators": a.top_indicators,
+            "second_best": a.second_best,
+            "second_confidence": a.second_confidence,
+            "confidence_margin": a.confidence_margin,
+            "uncertain": a.uncertain,
         }
         for a in reversed(alerts[-limit:])
     ]
