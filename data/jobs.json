@@ -4404,5 +4404,546 @@
         "classification_mode": "multiclass"
       }
     }
+  },
+  "08637697-52c": {
+    "phase": "Training (SVM)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "svm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500
+  },
+  "9f18b591-e9f": {
+    "phase": "Training (SVM)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "svm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500
+  },
+  "504c71cb-a9f": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "lightgbm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "error": "CUDA Tree Learner was not enabled in this build.\nPlease recompile with CMake option -DUSE_CUDA=1"
+  },
+  "dabc3d00-874": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "lightgbm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "error": "CUDA Tree Learner was not enabled in this build.\nPlease recompile with CMake option -DUSE_CUDA=1"
+  },
+  "d339abf1-116": {
+    "phase": "completed",
+    "progress": 100,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "lightgbm",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "complete",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "train_time_seconds": 93.38,
+    "model_id": "rf_1774254638",
+    "metrics": {
+      "train": {
+        "accuracy": 0.9600236981242889,
+        "precision_macro": 0.9600071634146026,
+        "recall_macro": 0.9487929554394451,
+        "f1_macro": 0.9540506727575147,
+        "f1_weighted": 0.9598617222553496,
+        "roc_auc": 0.9689425053392777,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            336128,
+            13857,
+            14075,
+            13825
+          ],
+          [
+            4707,
+            1008235,
+            14418,
+            13933
+          ],
+          [
+            4683,
+            13924,
+            1008153,
+            14013
+          ],
+          [
+            4643,
+            13954,
+            13913,
+            1008238
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9599241491770928,
+            "recall": 0.8894981277372745,
+            "f1": 0.9233702266065605
+          },
+          "sqli": {
+            "precision": 0.9602512452736744,
+            "recall": 0.9682529316916564,
+            "f1": 0.9642354883149561
+          },
+          "xss": {
+            "precision": 0.9596348229847158,
+            "recall": 0.9686579109950009,
+            "f1": 0.9641252560569054
+          },
+          "csrf": {
+            "precision": 0.9602184362229276,
+            "recall": 0.9687628513338483,
+            "f1": 0.9644717200516368
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9602586149436779,
+        "precision_macro": 0.9601284268603419,
+        "recall_macro": 0.9490314900457106,
+        "f1_macro": 0.954237486981137,
+        "f1_weighted": 0.9600968833409748,
+        "roc_auc": 0.9675655021171059,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            72048,
+            3043,
+            2916,
+            2968
+          ],
+          [
+            1019,
+            216138,
+            2922,
+            3056
+          ],
+          [
+            1048,
+            3016,
+            216043,
+            2915
+          ],
+          [
+            976,
+            2980,
+            2953,
+            216109
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9594758359856708,
+            "recall": 0.8897560975609756,
+            "f1": 0.9233016800584368
+          },
+          "sqli": {
+            "precision": 0.9598582448473867,
+            "recall": 0.9686423017455801,
+            "f1": 0.9642302682060707
+          },
+          "xss": {
+            "precision": 0.9609000418086232,
+            "recall": 0.9687071230640923,
+            "f1": 0.9647877889321568
+          },
+          "csrf": {
+            "precision": 0.9602795847996872,
+            "recall": 0.9690204378121945,
+            "f1": 0.9646302107278838
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.959876024795041,
+        "precision_macro": 0.9600050422153218,
+        "recall_macro": 0.9484033475854883,
+        "f1_macro": 0.9538304874181125,
+        "f1_weighted": 0.9597067785212507,
+        "roc_auc": 0.9671342651662014,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            71893,
+            2998,
+            3021,
+            3064
+          ],
+          [
+            941,
+            216098,
+            3019,
+            3076
+          ],
+          [
+            1017,
+            3067,
+            215944,
+            2995
+          ],
+          [
+            987,
+            2988,
+            2926,
+            216116
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9606483337341992,
+            "recall": 0.8878309622604228,
+            "f1": 0.9228053961774937
+          },
+          "sqli": {
+            "precision": 0.9597914288632962,
+            "recall": 0.9684673783466438,
+            "f1": 0.964109885452335
+          },
+          "xss": {
+            "precision": 0.960135165177182,
+            "recall": 0.9682588791290584,
+            "f1": 0.9641799108348793
+          },
+          "csrf": {
+            "precision": 0.95944524108661,
+            "recall": 0.9690561706058283,
+            "f1": 0.9642267572077418
+          }
+        }
+      },
+      "train_time_seconds": 93.38242626190186,
+      "feature_importance": {
+        "has_select": 458,
+        "has_union": 407,
+        "has_sleep": 369,
+        "has_or_1_equals_1": 333,
+        "has_drop": 257,
+        "has_insert": 280,
+        "has_delete": 475,
+        "has_update": 399,
+        "has_information_schema": 225,
+        "has_where": 335,
+        "has_order_by": 187,
+        "has_group_by": 281,
+        "has_having": 157,
+        "has_like": 243,
+        "has_in": 318,
+        "has_hex": 558,
+        "has_char": 146,
+        "has_concat": 328,
+        "has_ascii": 0,
+        "has_substring": 196,
+        "has_count": 192,
+        "has_benchmark": 253,
+        "has_waitfor": 191,
+        "has_exec": 322,
+        "has_xp_cmdshell": 173,
+        "quote_count": 1859,
+        "comment_marker_count": 741,
+        "semicolon_count": 613,
+        "equals_count": 970,
+        "parentheses_count": 1262,
+        "keyword_density": 3985,
+        "sqli_entropy": 4202,
+        "payload_length": 4216,
+        "special_char_ratio": 3764,
+        "encoded_char_ratio": 2219,
+        "logical_op_count": 599,
+        "comparison_count": 1520,
+        "has_script_tag": 197,
+        "has_javascript_protocol": 245,
+        "has_onerror": 315,
+        "has_onload": 332,
+        "has_alert": 232,
+        "has_document_write": 166,
+        "has_eval": 0,
+        "html_tag_count": 623,
+        "angle_bracket_count": 594,
+        "encoded_js_pattern": 148,
+        "suspicious_dom_keywords": 489,
+        "svg_script_count": 121,
+        "missing_csrf_token": 305,
+        "invalid_csrf_token": 255,
+        "cross_origin_flag": 429,
+        "missing_referer": 0,
+        "state_change_request": 249,
+        "suspicious_cookie_usage": 0,
+        "same_site_violation": 289,
+        "request_method_get": 307,
+        "request_method_post": 253,
+        "url_length": 3580,
+        "number_count": 3177,
+        "whitespace_ratio": 4602,
+        "has_cookies": 267,
+        "has_referer": 0
+      },
+      "model_path": "models\\rf_1774254638.joblib",
+      "preprocessor_path": "models\\rf_1774254638_preprocessor.joblib",
+      "model_id": "rf_1774254638",
+      "algorithm": "lightgbm",
+      "algorithm_label": "LightGBM",
+      "config": {
+        "algorithm": "lightgbm",
+        "n_estimators": 500,
+        "max_depth": 40,
+        "feature_count": 63,
+        "feature_mode": "sqli_37",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "35ed14d9-0fb": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "error": "catboost/private/libs/options/oblivious_tree_options.cpp:128: Maximum tree depth is 16"
+  },
+  "f9ad4a61-4bc": {
+    "phase": "failed",
+    "progress": 0,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "failed",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500,
+    "error": "catboost/private/libs/options/oblivious_tree_options.cpp:128: Maximum tree depth is 16"
+  },
+  "ba4014f7-1a8": {
+    "phase": "Training (CatBoost)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500
+  },
+  "63baef74-d5b": {
+    "phase": "Training (CatBoost)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500
+  },
+  "04d302fe-7a1": {
+    "phase": "Training (CatBoost)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 500,
+      "max_depth": 40,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": true
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 500
   }
 }

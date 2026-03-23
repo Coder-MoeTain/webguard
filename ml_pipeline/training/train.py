@@ -53,6 +53,26 @@ def _get_feature_importances(model, feature_columns: list) -> Dict[str, float]:
     return {f: 1.0 / n for f in feature_columns}
 
 
+def _is_lightgbm_cuda_build_error(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return (
+        "cuda tree learner was not enabled" in msg
+        or "recompile with cmake option -duse_cuda=1" in msg
+        or "gpu tree learner was not enabled" in msg
+    )
+
+
+def _is_catboost_cuda_error(exc: Exception) -> bool:
+    """Best-effort detection of CatBoost GPU/CUDA failures."""
+    msg = str(exc).lower()
+    return (
+        "cuda" in msg
+        or "tCUDAException" in msg
+        or "invalid configuration argument" in msg
+        or "task_type" in msg and "gpu" in msg
+    )
+
+
 def _get_model(
     algorithm: str,
     classification_mode: str,
@@ -140,13 +160,26 @@ def _get_model(
 
     if algorithm == "catboost":
         import catboost as cb
-        return cb.CatBoostClassifier(
-            iterations=n_estimators,
-            depth=max_depth or 6,
-            random_state=random_state,
-            verbose=0,
-            task_type="GPU",
-        )
+        # CatBoost hard limit: depth <= 16.
+        cat_depth = max_depth or 6
+        cat_depth = max(1, min(int(cat_depth), 16))
+        # CatBoost GPU can fail at runtime on some CUDA builds; fallback to CPU.
+        try:
+            return cb.CatBoostClassifier(
+                iterations=n_estimators,
+                depth=cat_depth,
+                random_state=random_state,
+                verbose=0,
+                task_type="GPU",
+            )
+        except Exception:
+            return cb.CatBoostClassifier(
+                iterations=n_estimators,
+                depth=cat_depth,
+                random_state=random_state,
+                verbose=0,
+                task_type="CPU",
+            )
 
     raise ValueError(f"Unknown algorithm: {algorithm}")
 
@@ -293,7 +326,35 @@ class RandomForestTrainer:
                 self.algorithm, self.classification_mode, self.n_estimators, self.max_depth,
                 min_child, colsample, self.random_state, scale_pos_weight, n_features,
             )
-            self.model_.fit(X_train, y_train)
+            try:
+                self.model_.fit(X_train, y_train)
+            except Exception as e:
+                # Some LightGBM wheels include package support but are built without CUDA.
+                # Fall back to CPU automatically so training can still proceed.
+                if self.algorithm == "lightgbm" and _is_lightgbm_cuda_build_error(e):
+                    self._log("LightGBM CUDA not enabled in this build; falling back to CPU...", 28)
+                    import lightgbm as lgb
+
+                    cpu_params = dict(self.model_.get_params())
+                    cpu_params["device"] = "cpu"
+                    self.model_ = lgb.LGBMClassifier(**cpu_params)
+                    self.model_.fit(X_train, y_train)
+                elif self.algorithm == "catboost" and _is_catboost_cuda_error(e):
+                    self._log("CatBoost CUDA failed; falling back to CPU...", 28)
+                    import catboost as cb
+
+                    cat_depth = self.max_depth or 6
+                    cat_depth = max(1, min(int(cat_depth), 16))
+                    self.model_ = cb.CatBoostClassifier(
+                        iterations=self.n_estimators,
+                        depth=cat_depth,
+                        random_state=self.random_state,
+                        verbose=0,
+                        task_type="CPU",
+                    )
+                    self.model_.fit(X_train, y_train)
+                else:
+                    raise
 
         train_time = time.time() - start
         self._log("Evaluating...", 80, {"step": "evaluate", "train_time_seconds": round(train_time, 2)})
