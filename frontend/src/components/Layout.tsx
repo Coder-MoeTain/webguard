@@ -1,22 +1,23 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Shield, Database, Cpu, BarChart3, TestTube, FileText, LogOut, FlaskConical, ShieldAlert } from 'lucide-react'
+import { APP_NAME_SHORT, APP_TAGLINE, LOGO_ALT } from '../researchBranding'
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: Shield },
-  { path: '/datasets/generate', label: 'Dataset Generation', icon: Database },
-  { path: '/datasets/upload', label: 'Dataset Upload', icon: Database },
-  { path: '/datasets/browse', label: 'Dataset Browser', icon: Database },
-  { path: '/features/extract', label: 'Feature Extraction', icon: Cpu },
-  { path: '/training/config', label: 'Training Config', icon: Cpu },
-  { path: '/evaluation', label: 'Model Evaluation', icon: BarChart3 },
-  { path: '/feature-importance', label: 'Feature Importance', icon: BarChart3 },
-  { path: '/robustness', label: 'Robustness Analysis', icon: TestTube },
-  { path: '/inference', label: 'Inference Testing', icon: TestTube },
-  { path: '/test-lab', label: 'Vulnerability Test Lab', icon: FlaskConical },
-  { path: '/ids', label: 'Real-time IDS', icon: ShieldAlert },
-  { path: '/models', label: 'Model Management', icon: FileText },
-  { path: '/reports', label: 'Report Export', icon: FileText },
+  { path: '/', label: 'Overview', icon: Shield },
+  { path: '/datasets/generate', label: 'Synthetic dataset', icon: Database },
+  { path: '/datasets/upload', label: 'Import dataset', icon: Database },
+  { path: '/datasets/browse', label: 'Dataset browser', icon: Database },
+  { path: '/features/extract', label: 'Feature extraction', icon: Cpu },
+  { path: '/training/config', label: 'Train models', icon: Cpu },
+  { path: '/evaluation', label: 'Metrics & confusion', icon: BarChart3 },
+  { path: '/feature-importance', label: 'Feature importance', icon: BarChart3 },
+  { path: '/robustness', label: 'Robustness & ablation', icon: TestTube },
+  { path: '/inference', label: 'Scoring lab', icon: TestTube },
+  { path: '/test-lab', label: 'Payload experiments', icon: FlaskConical },
+  { path: '/ids', label: 'IDS demo (stream)', icon: ShieldAlert },
+  { path: '/models', label: 'Saved models', icon: FileText },
+  { path: '/reports', label: 'Report export', icon: FileText },
 ]
 
 export default function Layout() {
@@ -38,11 +39,11 @@ export default function Layout() {
       }}>
         <Link to="/" style={{ display: 'block', padding: '0 1rem 1rem', borderBottom: '1px solid var(--bg-card)', textDecoration: 'none', color: 'inherit' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img src="/shield.svg" alt="WebGuard RF" style={{ width: 36, height: 36 }} />
+            <img src="/shield.svg" alt={LOGO_ALT} style={{ width: 36, height: 36 }} />
             <div>
-              <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--accent)' }}>WebGuard RF</h2>
+              <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--accent)' }}>{APP_NAME_SHORT}</h2>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Attack Detection
+                {APP_TAGLINE}
               </p>
             </div>
           </div>

@@ -70,6 +70,8 @@ export const models = {
     api.get('/models/', { params: params?.include_metrics ? { include_metrics: 1 } : undefined }),
   detail: (modelId: string) => api.get(`/models/${modelId}`),
   download: (modelId: string) => api.get(`/models/${modelId}/download`, { responseType: 'blob' }),
+  /** Generate & save F1 + confusion matrix PNGs; response includes base64 for each split */
+  evaluationPlots: (modelId: string) => api.post(`/models/${modelId}/evaluation-plots`),
   reset: () => api.post('/models/reset'),
   delete: (modelId: string) => api.delete(`/models/${modelId}`),
 }

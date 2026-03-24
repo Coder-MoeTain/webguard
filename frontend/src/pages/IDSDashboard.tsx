@@ -187,9 +187,9 @@ export default function IDSDashboard() {
 
   return (
     <div>
-      <h1 style={{ margin: '0 0 1rem', fontSize: '1.75rem' }}>Real-time IDS Dashboard</h1>
+      <h1 style={{ margin: '0 0 1rem', fontSize: '1.75rem' }}>IDS stream (research demo)</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        WebGuard RF Intrusion Detection System — ML-powered detection of SQLi, XSS, CSRF
+        Live scoring UI for experiment models — not a substitute for a production WAF. Multiclass labels: benign, SQLi, XSS, CSRF.
       </p>
 
       {/* Model selector */}

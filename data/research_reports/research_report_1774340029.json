@@ -1,0 +1,72 @@
+{
+  "config_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\configs\\research.yaml",
+  "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\sample_features.parquet",
+  "runs": [
+    {
+      "algorithm": "random_forest",
+      "seeds": [
+        {
+          "seed": 42,
+          "test_f1_macro": 0.9574413382368971,
+          "test_accuracy": 0.9573617588274483,
+          "model_id": "rf_1774340028",
+          "research": null
+        },
+        {
+          "seed": 43,
+          "test_f1_macro": 0.9559467507461288,
+          "test_accuracy": 0.955363091272485,
+          "model_id": "rf_1774340028",
+          "research": null
+        },
+        {
+          "seed": 44,
+          "test_f1_macro": 0.9628096707078403,
+          "test_accuracy": 0.9626915389740173,
+          "model_id": "rf_1774340029",
+          "research": {
+            "test_ece": 0.016318475797811142,
+            "test_brier": 0.07454358948559826,
+            "margin": {
+              "margin_mean": 0.928121291807781,
+              "margin_median": 0.9394707250914125,
+              "margin_p10": 0.8649386748573946,
+              "margin_p90": 1.0
+            },
+            "low_margin_rate_lt_0.2": 0.002664890073284477,
+            "bootstrap_f1_macro": {
+              "point": 0.9628096707078403,
+              "ci_low": 0.9532684798664829,
+              "ci_high": 0.9722376771605906,
+              "mean_boot": 0.9626116918215835,
+              "std_boot": 0.004940112299383601
+            },
+            "feature_ablation_accuracy": {
+              "baseline": 0.9626915389740173,
+              "sqli": 0.6375749500333111,
+              "xss": 0.9373750832778148,
+              "csrf": 0.9626915389740173,
+              "common": 0.770819453697535
+            }
+          }
+        }
+      ],
+      "evasion": {
+        "per_transform_accuracy": {
+          "double_url_encode_percent": 0.96,
+          "identity": 0.96,
+          "insert_space_after_keywords": 0.9366666666666666,
+          "random_case": 0.9533333333333334,
+          "url_encode_all": 0.5933333333333334
+        },
+        "label_mode": "multiclass",
+        "n_samples": 300
+      },
+      "summary": {
+        "test_f1_macro_mean": 0.958732586563622,
+        "test_f1_macro_stdev": 0.0029467959188658934,
+        "n_seeds_ok": 3
+      }
+    }
+  ]
+}

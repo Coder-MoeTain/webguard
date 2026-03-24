@@ -5,7 +5,7 @@ Lexical, structural, behavioral, and contextual features.
 
 import re
 import math
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Literal
 
 # 37 SQL Injection features for sqli_37 mode (defined first for FEATURE_GROUPS)
 SQLI_37_FEATURES = [
@@ -44,6 +44,76 @@ FEATURE_GROUPS = {
     ],
     "hybrid": None,  # payload_only + response_only
 }
+
+# Research ablation: semantic groups (subset of columns present in payload / hybrid modes).
+ABLATION_GROUPS_PAYLOAD: Dict[str, List[str]] = {
+    "sqli": [
+        "has_select", "has_union", "has_sleep", "has_or_1_equals_1", "has_drop",
+        "has_insert", "has_delete", "has_update", "has_information_schema",
+        "quote_count", "comment_marker_count", "semicolon_count", "equals_count",
+        "parentheses_count", "keyword_density", "sqli_entropy",
+    ],
+    "xss": [
+        "has_script_tag", "has_javascript_protocol", "has_onerror", "has_onload",
+        "has_alert", "has_document_write", "has_eval", "html_tag_count",
+        "angle_bracket_count", "encoded_js_pattern", "suspicious_dom_keywords",
+        "svg_script_count",
+    ],
+    "csrf": [
+        "missing_csrf_token", "invalid_csrf_token", "cross_origin_flag",
+        "missing_referer", "state_change_request", "suspicious_cookie_usage",
+        "same_site_violation",
+    ],
+    "common": [
+        "request_method_get", "request_method_post", "payload_length",
+        "url_length", "number_count", "special_char_ratio", "encoded_char_ratio",
+        "whitespace_ratio", "has_cookies", "has_referer",
+    ],
+}
+
+ABLATION_GROUPS_SQLI_37: Dict[str, List[str]] = {
+    "sql_keywords": [
+        "has_select", "has_union", "has_sleep", "has_or_1_equals_1", "has_drop",
+        "has_insert", "has_delete", "has_update", "has_information_schema",
+        "has_where", "has_order_by", "has_group_by", "has_having", "has_like",
+        "has_in", "has_hex", "has_char", "has_concat", "has_ascii", "has_substring",
+        "has_count", "has_benchmark", "has_waitfor", "has_exec", "has_xp_cmdshell",
+    ],
+    "structural": [
+        "quote_count", "comment_marker_count", "semicolon_count", "equals_count",
+        "parentheses_count",
+    ],
+    "lexical": [
+        "keyword_density", "sqli_entropy", "payload_length", "special_char_ratio",
+        "encoded_char_ratio", "logical_op_count", "comparison_count",
+    ],
+}
+
+ABLATION_GROUPS_RESPONSE: Dict[str, List[str]] = {
+    "response": list(FEATURE_GROUPS["response_only"]),
+}
+
+
+def ablation_groups_for_mode(
+    feature_mode: Literal["payload_only", "response_only", "hybrid", "sqli_37"],
+    feature_columns: List[str],
+) -> Dict[str, List[str]]:
+    """Map semantic group names to columns that exist in the trained feature matrix."""
+    cols = set(feature_columns)
+    if feature_mode == "sqli_37":
+        base = ABLATION_GROUPS_SQLI_37.copy()
+        for k in ("xss", "csrf", "common"):
+            base[k] = [c for c in ABLATION_GROUPS_PAYLOAD[k] if c in cols]
+    elif feature_mode == "response_only":
+        base = {k: [c for c in v if c in cols] for k, v in ABLATION_GROUPS_RESPONSE.items()}
+    elif feature_mode == "hybrid":
+        base = {}
+        for name, feats in ABLATION_GROUPS_PAYLOAD.items():
+            base[name] = [f for f in feats if f in cols]
+        base["response"] = [f for f in ABLATION_GROUPS_RESPONSE["response"] if f in cols]
+    else:
+        base = {k: [f for f in v if f in cols] for k, v in ABLATION_GROUPS_PAYLOAD.items()}
+    return {k: v for k, v in base.items() if v}
 
 
 def _entropy(s: str) -> float:

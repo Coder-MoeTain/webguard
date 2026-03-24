@@ -58,6 +58,7 @@ WebGuard RF is an end-to-end ML-based web attack detection system for academic c
 | **Training Monitor** | Real-time progress chart, system metrics (CPU, memory, GPU via `nvidia-smi`), config cards, and result charts |
 | **Feature Importance** | Model selector, top-N selector, bar/pie/table views, metadata cards, download button |
 | **Models API with metrics** | `GET /api/models/?include_metrics=1` returns models enriched with accuracy and metrics from completed jobs |
+| **Research suite** | `configs/research.yaml` + `python scripts/run_research_experiments.py` for multi-seed runs, ECE/Brier/margin stats, bootstrap CIs on macro-F1, semantic feature ablation, and a small evasion transform battery (see `ml_pipeline/research/`) |
 
 ---
 

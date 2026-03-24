@@ -1,0 +1,383 @@
+{
+  "description": {
+    "synthetic": "Procedural generator (20k rows, 80% attack / 20% benign, 2% label noise, seed=42).",
+    "curated": "Curated static payloads: classic SQLi/XSS/CSRF patterns and benign HTTP-like strings; each row wrapped with the same HTTP simulation as the synthetic pipeline. 400 samples per class (1,600 rows), shuffled, seed=7.",
+    "split": "Stratified 70/15/15 on synthetic features only; curated set is never used for training.",
+    "features": "payload_only mode; same column order for both corpora."
+  },
+  "class_names": [
+    "benign",
+    "sqli",
+    "xss",
+    "csrf"
+  ],
+  "best_algorithm_by_synthetic_macro_f1": "random_forest",
+  "comparison": [
+    {
+      "algorithm": "random_forest",
+      "synthetic_test": {
+        "accuracy": 0.9783405531489503,
+        "f1_macro": 0.977759107660116,
+        "f1_weighted": 0.9783334886544156,
+        "precision_macro": 0.9782552855846227,
+        "recall_macro": 0.9773368246617913,
+        "roc_auc_macro_ovr": 0.9847438865758146,
+        "ece": 0.007600044817674489,
+        "brier": 0.04437525546562496,
+        "confusion_matrix": [
+          [
+            580,
+            11,
+            5,
+            7
+          ],
+          [
+            4,
+            784,
+            4,
+            3
+          ],
+          [
+            6,
+            11,
+            784,
+            1
+          ],
+          [
+            4,
+            4,
+            5,
+            788
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.9764309764309764,
+            "recall": 0.9618573797678275,
+            "f1": 0.9690893901420217
+          },
+          "sqli": {
+            "precision": 0.9679012345679012,
+            "recall": 0.9861635220125786,
+            "f1": 0.9769470404984424
+          },
+          "xss": {
+            "precision": 0.9824561403508771,
+            "recall": 0.9775561097256857,
+            "f1": 0.98
+          },
+          "csrf": {
+            "precision": 0.986232790988736,
+            "recall": 0.9837702871410736,
+            "f1": 0.985
+          }
+        }
+      },
+      "curated_test": {
+        "accuracy": 0.530625,
+        "f1_macro": 0.531272694804972,
+        "f1_weighted": 0.531272694804972,
+        "precision_macro": 0.7970959989876084,
+        "recall_macro": 0.530625,
+        "roc_auc_macro_ovr": 0.9531132812499999,
+        "ece": 0.1283548166319702,
+        "brier": 0.4891867113919382,
+        "confusion_matrix": [
+          [
+            85,
+            1,
+            1,
+            313
+          ],
+          [
+            0,
+            171,
+            0,
+            229
+          ],
+          [
+            2,
+            0,
+            206,
+            192
+          ],
+          [
+            12,
+            0,
+            1,
+            387
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.8585858585858586,
+            "recall": 0.2125,
+            "f1": 0.3406813627254509
+          },
+          "sqli": {
+            "precision": 0.9941860465116279,
+            "recall": 0.4275,
+            "f1": 0.5979020979020979
+          },
+          "xss": {
+            "precision": 0.9903846153846154,
+            "recall": 0.515,
+            "f1": 0.6776315789473685
+          },
+          "csrf": {
+            "precision": 0.3452274754683318,
+            "recall": 0.9675,
+            "f1": 0.5088757396449705
+          }
+        }
+      }
+    },
+    {
+      "algorithm": "logistic_regression",
+      "synthetic_test": {
+        "accuracy": 0.9743418860379873,
+        "f1_macro": 0.9733982110378037,
+        "f1_weighted": 0.9743711263440872,
+        "precision_macro": 0.9730587341638591,
+        "recall_macro": 0.9737634963348725,
+        "roc_auc_macro_ovr": 0.9853304169412315,
+        "ece": 0.027073227391442772,
+        "brier": 0.05917466600353902,
+        "confusion_matrix": [
+          [
+            582,
+            9,
+            5,
+            7
+          ],
+          [
+            19,
+            770,
+            4,
+            2
+          ],
+          [
+            6,
+            11,
+            784,
+            1
+          ],
+          [
+            4,
+            4,
+            5,
+            788
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.9525368248772504,
+            "recall": 0.9651741293532339,
+            "f1": 0.9588138385502472
+          },
+          "sqli": {
+            "precision": 0.9697732997481109,
+            "recall": 0.9685534591194969,
+            "f1": 0.9691629955947136
+          },
+          "xss": {
+            "precision": 0.9824561403508771,
+            "recall": 0.9775561097256857,
+            "f1": 0.98
+          },
+          "csrf": {
+            "precision": 0.9874686716791979,
+            "recall": 0.9837702871410736,
+            "f1": 0.9856160100062539
+          }
+        }
+      },
+      "curated_test": {
+        "accuracy": 0.696875,
+        "f1_macro": 0.6536433536540205,
+        "f1_weighted": 0.6536433536540206,
+        "precision_macro": 0.7295344187374393,
+        "recall_macro": 0.696875,
+        "roc_auc_macro_ovr": 0.9261583333333333,
+        "ece": 0.11879086512558787,
+        "brier": 0.4505927900445353,
+        "confusion_matrix": [
+          [
+            68,
+            25,
+            188,
+            119
+          ],
+          [
+            0,
+            313,
+            26,
+            61
+          ],
+          [
+            11,
+            1,
+            358,
+            30
+          ],
+          [
+            13,
+            0,
+            11,
+            376
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.7391304347826086,
+            "recall": 0.17,
+            "f1": 0.2764227642276423
+          },
+          "sqli": {
+            "precision": 0.9233038348082596,
+            "recall": 0.7825,
+            "f1": 0.8470906630581867
+          },
+          "xss": {
+            "precision": 0.614065180102916,
+            "recall": 0.895,
+            "f1": 0.728382502543235
+          },
+          "csrf": {
+            "precision": 0.6416382252559727,
+            "recall": 0.94,
+            "f1": 0.7626774847870182
+          }
+        }
+      }
+    },
+    {
+      "algorithm": "catboost",
+      "synthetic_test": {
+        "accuracy": 0.9783405531489503,
+        "f1_macro": 0.9777047914828806,
+        "f1_weighted": 0.9783323117040181,
+        "precision_macro": 0.9782662028829122,
+        "recall_macro": 0.9772366963724206,
+        "roc_auc_macro_ovr": 0.9843931832405071,
+        "ece": 0.0061672686010374785,
+        "brier": 0.044304270819207264,
+        "confusion_matrix": [
+          [
+            579,
+            12,
+            5,
+            7
+          ],
+          [
+            4,
+            785,
+            4,
+            2
+          ],
+          [
+            6,
+            11,
+            784,
+            1
+          ],
+          [
+            4,
+            4,
+            5,
+            788
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.9763912310286678,
+            "recall": 0.9601990049751243,
+            "f1": 0.9682274247491639
+          },
+          "sqli": {
+            "precision": 0.9667487684729064,
+            "recall": 0.9874213836477987,
+            "f1": 0.9769757311761046
+          },
+          "xss": {
+            "precision": 0.9824561403508771,
+            "recall": 0.9775561097256857,
+            "f1": 0.98
+          },
+          "csrf": {
+            "precision": 0.9874686716791979,
+            "recall": 0.9837702871410736,
+            "f1": 0.9856160100062539
+          }
+        }
+      },
+      "curated_test": {
+        "accuracy": 0.785625,
+        "f1_macro": 0.7838753034105193,
+        "f1_weighted": 0.7838753034105193,
+        "precision_macro": 0.8343921591738428,
+        "recall_macro": 0.785625,
+        "roc_auc_macro_ovr": 0.9375682291666667,
+        "ece": 0.09061765407592844,
+        "brier": 0.34742874190378187,
+        "confusion_matrix": [
+          [
+            188,
+            9,
+            1,
+            202
+          ],
+          [
+            16,
+            359,
+            3,
+            22
+          ],
+          [
+            15,
+            7,
+            323,
+            55
+          ],
+          [
+            11,
+            0,
+            2,
+            387
+          ]
+        ],
+        "per_class": {
+          "benign": {
+            "precision": 0.8173913043478261,
+            "recall": 0.47,
+            "f1": 0.5968253968253968
+          },
+          "sqli": {
+            "precision": 0.9573333333333334,
+            "recall": 0.8975,
+            "f1": 0.9264516129032258
+          },
+          "xss": {
+            "precision": 0.9817629179331308,
+            "recall": 0.8075,
+            "f1": 0.8861454046639232
+          },
+          "csrf": {
+            "precision": 0.581081081081081,
+            "recall": 0.9675,
+            "f1": 0.726078799249531
+          }
+        }
+      }
+    }
+  ],
+  "train_size": 13999,
+  "synthetic_test_size": 3001,
+  "curated_test_size": 1600,
+  "feature_dimension": 45,
+  "figures": {
+    "comparison_bars": "docs/images/paper/fig_macro_f1_comparison.png",
+    "confusion_synthetic": "docs/images/paper/fig_cm_synthetic_test.png",
+    "confusion_curated": "docs/images/paper/fig_cm_curated_corpus.png"
+  }
+}

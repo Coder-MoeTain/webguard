@@ -99,6 +99,42 @@ class DataPreprocessor:
         )
         return X_train, y_train, X_val, y_val, X_test, y_test
 
+    def split_with_indices(
+        self,
+        X: pd.DataFrame,
+        y: np.ndarray,
+    ) -> Tuple[
+        pd.DataFrame,
+        np.ndarray,
+        pd.DataFrame,
+        np.ndarray,
+        pd.DataFrame,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Stratified train/val/test split; returns row indices into the original X for each split."""
+        idx = np.arange(len(X))
+        X_train, X_temp, y_train, y_temp, i_train, i_temp = train_test_split(
+            X,
+            y,
+            idx,
+            test_size=(1 - self.train_ratio),
+            stratify=y,
+            random_state=self.random_state,
+        )
+        val_ratio_adj = self.val_ratio / (self.val_ratio + self.test_ratio)
+        X_val, X_test, y_val, y_test, i_val, i_test = train_test_split(
+            X_temp,
+            y_temp,
+            i_temp,
+            test_size=(1 - val_ratio_adj),
+            stratify=y_temp,
+            random_state=self.random_state,
+        )
+        return X_train, y_train, X_val, y_val, X_test, y_test, i_train, i_val, i_test
+
     def get_class_weights(self, y: np.ndarray) -> dict:
         """Compute class weights for imbalanced data."""
         from sklearn.utils.class_weight import compute_class_weight

@@ -10,11 +10,14 @@ from fastapi.responses import FileResponse
 
 from ..core.config import settings
 from ..core.deps import get_current_user
-from ..core.paths import resolve_data_path
+from ..core.paths import normalize_path_for_api, resolve_data_path
 from ..services.job_store import list_jobs
 
 router = APIRouter()
 _MODELS_DIR = resolve_data_path(settings.MODELS_DIR)
+_EVAL_PLOTS_DIR = resolve_data_path("data/evaluation_plots")
+
+_ALLOWED_PLOT_SUFFIXES = ("_f1_scores.png", "_confusion_matrix.png")
 
 
 def _get_model_metrics_map():
@@ -123,6 +126,68 @@ def list_models(
                 m["algorithm_label"] = m.get("algorithm") or "Unknown"
 
     return {"models": models}
+
+
+@router.post("/{model_id}/evaluation-plots")
+def create_evaluation_plots(model_id: str, user: dict = Depends(get_current_user)):
+    """
+    Generate and save F1 score and confusion matrix PNGs (train/val/test when available)
+    under data/evaluation_plots/{model_id}/. Returns base64 for inline display in the UI.
+    """
+    if "/" in model_id or "\\" in model_id or ".." in model_id:
+        raise HTTPException(400, "Invalid model_id")
+
+    model_path = _MODELS_DIR / f"{model_id}.joblib"
+    if not model_path.exists():
+        raise HTTPException(404, "Model not found")
+
+    metrics_map = _get_model_metrics_map()
+    metrics = metrics_map.get(model_id)
+    if not metrics:
+        raise HTTPException(
+            404,
+            "No stored training metrics for this model. Train from the dashboard or run training so the job record includes metrics.",
+        )
+
+    try:
+        from ml_pipeline.evaluation.plot_metrics import save_evaluation_plots_for_metrics
+    except ImportError as e:
+        raise HTTPException(500, f"Plotting dependencies missing: {e}") from e
+
+    saved = save_evaluation_plots_for_metrics(metrics, _EVAL_PLOTS_DIR, model_id)
+    if not saved:
+        raise HTTPException(400, "Metrics contain no confusion matrices; cannot build plots.")
+
+    rel_root = normalize_path_for_api(_EVAL_PLOTS_DIR.resolve())
+    out = {
+        "model_id": model_id,
+        "directory": f"{rel_root}/{model_id}",
+        "splits": {},
+    }
+    for split, data in saved.items():
+        out["splits"][split] = {
+            "f1_image_base64": data["f1_b64"],
+            "confusion_image_base64": data["confusion_b64"],
+            "f1_filename": Path(data["f1_png"]).name,
+            "confusion_filename": Path(data["confusion_png"]).name,
+        }
+    return out
+
+
+@router.get("/{model_id}/evaluation-plots/{filename}")
+def get_evaluation_plot_file(model_id: str, filename: str, user: dict = Depends(get_current_user)):
+    """Serve a previously generated evaluation PNG (auth required)."""
+    if "/" in model_id or "\\" in model_id or ".." in model_id:
+        raise HTTPException(400, "Invalid model_id")
+    if ".." in filename or "/" in filename or "\\" in filename:
+        raise HTTPException(400, "Invalid filename")
+    if not any(filename.endswith(s) for s in _ALLOWED_PLOT_SUFFIXES):
+        raise HTTPException(400, "Unknown plot file type")
+
+    path = _EVAL_PLOTS_DIR / model_id / filename
+    if not path.is_file():
+        raise HTTPException(404, "Plot file not found; generate plots first.")
+    return FileResponse(path, media_type="image/png", filename=filename)
 
 
 def _get_feature_importances(model, feature_columns: list) -> dict:

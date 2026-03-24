@@ -4945,5 +4945,304 @@
     "test_size": 750150,
     "feature_count": 63,
     "n_estimators": 500
+  },
+  "68989e42-f06": {
+    "phase": "Training (CatBoost)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "payload_only",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 350,
+      "max_depth": 30,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": false
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 350
+  },
+  "c956c818-26c3-42db-987b-494d1069e59c": {
+    "phase": "completed",
+    "progress": 100,
+    "step": "complete",
+    "detail": "CLI training",
+    "metrics": {
+      "train": {
+        "accuracy": 0.9608515502214602,
+        "precision_macro": 0.9616813372259027,
+        "recall_macro": 0.9602212277638711,
+        "f1_macro": 0.9608978264275768,
+        "f1_weighted": 0.9608587550505527,
+        "roc_auc": 0.991916129299174,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            1350,
+            17,
+            28,
+            26
+          ],
+          [
+            9,
+            1787,
+            31,
+            30
+          ],
+          [
+            10,
+            30,
+            1789,
+            21
+          ],
+          [
+            18,
+            20,
+            34,
+            1799
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9733237202595529,
+            "recall": 0.9500351864883885,
+            "f1": 0.9615384615384616
+          },
+          "sqli": {
+            "precision": 0.9638619201725998,
+            "recall": 0.9623047926763597,
+            "f1": 0.9630827270277553
+          },
+          "xss": {
+            "precision": 0.9505844845908608,
+            "recall": 0.967027027027027,
+            "f1": 0.9587352625937835
+          },
+          "csrf": {
+            "precision": 0.9589552238805971,
+            "recall": 0.9615179048637092,
+            "f1": 0.9602348545503069
+          }
+        }
+      },
+      "validation": {
+        "accuracy": 0.9606666666666667,
+        "precision_macro": 0.960336639832515,
+        "recall_macro": 0.9598744836341696,
+        "f1_macro": 0.960068535628007,
+        "f1_weighted": 0.9606583943315309,
+        "roc_auc": 0.9728392344026124,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            289,
+            8,
+            3,
+            5
+          ],
+          [
+            6,
+            385,
+            2,
+            5
+          ],
+          [
+            4,
+            8,
+            378,
+            6
+          ],
+          [
+            4,
+            2,
+            6,
+            389
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9537953795379538,
+            "recall": 0.9475409836065574,
+            "f1": 0.9506578947368421
+          },
+          "sqli": {
+            "precision": 0.9553349875930521,
+            "recall": 0.9673366834170855,
+            "f1": 0.9612983770287141
+          },
+          "xss": {
+            "precision": 0.9717223650385605,
+            "recall": 0.9545454545454546,
+            "f1": 0.9630573248407643
+          },
+          "csrf": {
+            "precision": 0.9604938271604938,
+            "recall": 0.970074812967581,
+            "f1": 0.9652605459057072
+          }
+        }
+      },
+      "test": {
+        "accuracy": 0.9560293137908061,
+        "precision_macro": 0.9561311760554673,
+        "recall_macro": 0.9559049161760347,
+        "f1_macro": 0.9559860420631298,
+        "f1_weighted": 0.9560193505874417,
+        "roc_auc": 0.971372356204639,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 0.0,
+        "confusion_matrix": [
+          [
+            290,
+            8,
+            4,
+            2
+          ],
+          [
+            5,
+            377,
+            7,
+            10
+          ],
+          [
+            4,
+            5,
+            382,
+            6
+          ],
+          [
+            4,
+            2,
+            9,
+            386
+          ]
+        ],
+        "per_class_metrics": {
+          "benign": {
+            "precision": 0.9570957095709571,
+            "recall": 0.9539473684210527,
+            "f1": 0.9555189456342669
+          },
+          "sqli": {
+            "precision": 0.9617346938775511,
+            "recall": 0.9448621553884712,
+            "f1": 0.9532237673830595
+          },
+          "xss": {
+            "precision": 0.9502487562189055,
+            "recall": 0.9622166246851386,
+            "f1": 0.9561952440550688
+          },
+          "csrf": {
+            "precision": 0.9554455445544554,
+            "recall": 0.9625935162094763,
+            "f1": 0.9590062111801242
+          }
+        }
+      },
+      "train_time_seconds": 0.16174721717834473,
+      "feature_importance": {
+        "has_select": 0.006619632241161006,
+        "has_union": 0.001525676770371164,
+        "has_sleep": 0.0013504344079737335,
+        "has_or_1_equals_1": 0.002128030764995246,
+        "has_drop": 0.00022305729756443796,
+        "has_insert": 0.00019667079430828633,
+        "has_delete": 0.00046737024686439334,
+        "has_update": 0.0003387506141896037,
+        "has_information_schema": 0.00015328174146950983,
+        "quote_count": 0.04428763393327636,
+        "comment_marker_count": 0.07507342351943413,
+        "semicolon_count": 0.003995867999470172,
+        "equals_count": 0.022125041378590563,
+        "parentheses_count": 0.055161658949360426,
+        "keyword_density": 0.023134559950150416,
+        "sqli_entropy": 0.04074558188534783,
+        "has_script_tag": 0.003961033675984848,
+        "has_javascript_protocol": 0.0026428530802986645,
+        "has_onerror": 0.002233882303952027,
+        "has_onload": 0.0004509985866168472,
+        "has_alert": 0.07530780736703556,
+        "has_document_write": 0.00010429572283879463,
+        "has_eval": 0.0,
+        "html_tag_count": 0.027383822614204325,
+        "angle_bracket_count": 0.025959148093667696,
+        "encoded_js_pattern": 0.002382527119283224,
+        "suspicious_dom_keywords": 0.0054372874628103975,
+        "svg_script_count": 0.0008038934003672014,
+        "missing_csrf_token": 0.04332022447137685,
+        "invalid_csrf_token": 0.023386520287888075,
+        "cross_origin_flag": 0.005860399320327022,
+        "missing_referer": 0.0,
+        "state_change_request": 0.05700331847227733,
+        "suspicious_cookie_usage": 0.0,
+        "same_site_violation": 0.00330711516136039,
+        "request_method_get": 0.04546286191858177,
+        "request_method_post": 0.04040851616965698,
+        "payload_length": 0.026724080153878706,
+        "url_length": 0.07914348982876852,
+        "number_count": 0.03602507399557433,
+        "special_char_ratio": 0.0751937741561627,
+        "encoded_char_ratio": 0.013167935020887008,
+        "whitespace_ratio": 0.06253072530699642,
+        "has_cookies": 0.0642717438146771,
+        "has_referer": 0.0
+      },
+      "model_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\models\\rf_1774350547.joblib",
+      "preprocessor_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\models\\rf_1774350547_preprocessor.joblib",
+      "model_id": "rf_1774350547",
+      "algorithm": "random_forest",
+      "algorithm_label": "Random Forest (sklearn)",
+      "config": {
+        "algorithm": "random_forest",
+        "n_estimators": 120,
+        "max_depth": 24,
+        "feature_count": 45,
+        "feature_mode": "payload_only",
+        "classification_mode": "multiclass"
+      }
+    }
+  },
+  "5df17bbe-c5a": {
+    "phase": "Training (CatBoost)...",
+    "progress": 25,
+    "config": {
+      "data_path": "D:\\phd form\\Second Seminar\\Random Forest-Sqli\\data\\features_a419205910bb.parquet",
+      "algorithm": "catboost",
+      "classification_mode": "multiclass",
+      "feature_mode": "sqli_37",
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "n_estimators": 100,
+      "max_depth": 12,
+      "min_samples_split": 2,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 42,
+      "hyperparameter_tuning": false
+    },
+    "step": "training",
+    "detail": "Reading dataset",
+    "samples_loaded": 5000999,
+    "train_size": 3500699,
+    "val_size": 750150,
+    "test_size": 750150,
+    "feature_count": 63,
+    "n_estimators": 100
   }
 }

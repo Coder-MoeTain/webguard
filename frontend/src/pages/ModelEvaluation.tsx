@@ -43,7 +43,34 @@ function fmt(v: number | null | undefined): string {
   return (v * 100).toFixed(2) + '%'
 }
 
-function ModelDetailPanel({ metrics }: { metrics?: ModelWithMetrics['metrics'] }) {
+type PlotSplitPayload = {
+  f1_image_base64: string
+  confusion_image_base64: string
+  f1_filename: string
+  confusion_filename: string
+}
+
+type PlotsResponse = {
+  model_id: string
+  directory: string
+  splits: Record<string, PlotSplitPayload>
+}
+
+function ModelDetailPanel({
+  modelId,
+  metrics,
+  plots,
+  plotsLoading,
+  plotsError,
+  onGeneratePlots,
+}: {
+  modelId: string
+  metrics?: ModelWithMetrics['metrics']
+  plots?: PlotsResponse | null
+  plotsLoading?: boolean
+  plotsError?: string | null
+  onGeneratePlots: () => void
+}) {
   if (!metrics) {
     return <div style={{ padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>No metrics available for this model.</div>
   }
@@ -85,6 +112,68 @@ function ModelDetailPanel({ metrics }: { metrics?: ModelWithMetrics['metrics'] }
           Total train time: {metrics.train_time_seconds.toFixed(1)}s
         </div>
       )}
+
+      <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--bg-card)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+          <h4 style={{ margin: 0, fontSize: '0.95rem' }}>Saved figures (F1 &amp; confusion matrix)</h4>
+          <button
+            type="button"
+            onClick={onGeneratePlots}
+            disabled={plotsLoading}
+            style={{
+              padding: '0.45rem 0.9rem',
+              fontSize: '0.85rem',
+              background: 'var(--accent)',
+              color: 'var(--bg-primary)',
+              border: 'none',
+              borderRadius: 6,
+              cursor: plotsLoading ? 'wait' : 'pointer',
+              opacity: plotsLoading ? 0.7 : 1,
+            }}
+          >
+            {plotsLoading ? 'Generating…' : 'Create & save images'}
+          </button>
+        </div>
+        <p style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: 720 }}>
+          Writes PNGs under <code style={{ fontSize: '0.75rem' }}>data/evaluation_plots/{modelId}/</code> (train / validation / test when available).
+        </p>
+        {plotsError && (
+          <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(248,113,113,0.15)', borderRadius: 6, fontSize: '0.85rem', color: 'var(--danger)', marginBottom: '0.75rem' }}>
+            {plotsError}
+          </div>
+        )}
+        {plots && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {(['train', 'validation', 'test'] as const).map((split) => {
+              const s = plots.splits[split]
+              if (!s) return null
+              return (
+                <div key={split}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem', textTransform: 'capitalize' }}>{split}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                    <div>
+                      <div style={{ ...metricLabelStyle, marginBottom: 6 }}>F1 scores — {s.f1_filename}</div>
+                      <img
+                        src={`data:image/png;base64,${s.f1_image_base64}`}
+                        alt={`${split} F1`}
+                        style={{ width: '100%', maxWidth: 480, borderRadius: 8, border: '1px solid var(--bg-card)' }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ ...metricLabelStyle, marginBottom: 6 }}>Confusion matrix — {s.confusion_filename}</div>
+                      <img
+                        src={`data:image/png;base64,${s.confusion_image_base64}`}
+                        alt={`${split} confusion matrix`}
+                        style={{ width: '100%', maxWidth: 480, borderRadius: 8, border: '1px solid var(--bg-card)' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -94,6 +183,31 @@ export default function ModelEvaluation() {
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
+  const [plotsByModel, setPlotsByModel] = useState<Record<string, PlotsResponse | null>>({})
+  const [plotsLoadingId, setPlotsLoadingId] = useState<string | null>(null)
+  const [plotsErrorByModel, setPlotsErrorByModel] = useState<Record<string, string>>({})
+
+  const handleGeneratePlots = (modelId: string) => {
+    setPlotsLoadingId(modelId)
+    setPlotsErrorByModel((prev) => {
+      const next = { ...prev }
+      delete next[modelId]
+      return next
+    })
+    models
+      .evaluationPlots(modelId)
+      .then(({ data }) => {
+        setPlotsByModel((prev) => ({ ...prev, [modelId]: data as PlotsResponse }))
+      })
+      .catch((err: unknown) => {
+        const msg =
+          err && typeof err === 'object' && 'response' in err
+            ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+            : String(err)
+        setPlotsErrorByModel((prev) => ({ ...prev, [modelId]: msg || 'Failed to generate plots' }))
+      })
+      .finally(() => setPlotsLoadingId(null))
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -215,7 +329,14 @@ export default function ModelEvaluation() {
                     {selectedId === m.id && selected && (
                       <tr key={`${m.id}-detail`}>
                         <td colSpan={9} style={{ padding: 0, borderBottom: '1px solid var(--bg-card)', verticalAlign: 'top' }}>
-                          <ModelDetailPanel metrics={selected.metrics} />
+                          <ModelDetailPanel
+                            modelId={selected.id}
+                            metrics={selected.metrics}
+                            plots={plotsByModel[selected.id] ?? null}
+                            plotsLoading={plotsLoadingId === selected.id}
+                            plotsError={plotsErrorByModel[selected.id] ?? null}
+                            onGeneratePlots={() => handleGeneratePlots(selected.id)}
+                          />
                         </td>
                       </tr>
                     )}

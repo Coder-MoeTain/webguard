@@ -1,0 +1,31 @@
+# Reproducible research experiment defaults (see scripts/run_research_experiments.py).
+# Use Random Forest (or logistic_regression) on machines without NVIDIA GPU; XGBoost/LightGBM
+# are configured for CUDA in train.py.
+
+featured_data_path: data/sample_features.parquet
+raw_data_path: data/sample_dataset.parquet
+
+feature_extraction:
+  enabled: false
+  raw_path: data/sample_dataset.parquet
+  output_path: data/research_features.parquet
+  feature_mode: payload_only
+
+training:
+  classification_mode: multiclass
+  feature_mode: payload_only
+  algorithms:
+    - random_forest
+  seeds: [42, 43, 44]
+  n_estimators: 100
+  max_depth: 20
+  output_dir: models/research
+  bootstrap_resamples: 500
+  extended_research_on_last_seed_only: true
+
+evasion:
+  enabled: true
+  n_samples: 300
+  transforms: null
+
+report_dir: data/research_reports

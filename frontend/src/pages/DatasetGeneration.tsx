@@ -59,9 +59,9 @@ export default function DatasetGeneration() {
 
   return (
     <div>
-      <h1 style={{ margin: '0 0 1rem' }}>Dataset Generation</h1>
+      <h1 style={{ margin: '0 0 1rem' }}>Synthetic dataset (controlled corpus)</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        Generate up to 5 million samples with 80% attack and 20% benign traffic.
+        Build a reproducible labeled corpus (up to millions of rows) with adjustable class priors, seed, and optional label noise for robustness studies.
       </p>
       <div style={{ maxWidth: 500, background: 'var(--bg-secondary)', padding: '1.5rem', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
         <form onSubmit={handleSubmit}>

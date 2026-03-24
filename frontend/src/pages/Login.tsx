@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { auth } from '../services/api'
+import { APP_NAME, APP_SUBTAGLINE, LOGO_ALT, REPRO_CLI_HINT } from '../researchBranding'
 
 export default function Login() {
   const [username, setUsername] = useState('admin')
@@ -42,10 +43,13 @@ export default function Login() {
         border: '1px solid var(--bg-card)',
       }}>
         <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-          <img src="/shield.svg" alt="WebGuard RF" style={{ width: 64, height: 64, marginBottom: '0.5rem' }} />
-          <h1 style={{ margin: '0.5rem 0', fontSize: '1.5rem' }}>WebGuard RF</h1>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Web Attack Detection Platform
+          <img src="/shield.svg" alt={LOGO_ALT} style={{ width: 64, height: 64, marginBottom: '0.5rem' }} />
+          <h1 style={{ margin: '0.5rem 0', fontSize: '1.5rem' }}>{APP_NAME}</h1>
+          <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            {APP_SUBTAGLINE}
+          </p>
+          <p style={{ margin: '0.75rem 0 0', color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.4 }}>
+            {REPRO_CLI_HINT}
           </p>
         </div>
         <form onSubmit={handleSubmit} style={{ padding: '0 2rem 2rem' }}>

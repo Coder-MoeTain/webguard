@@ -14,66 +14,12 @@ from ..core.validation import validate_data_path
 
 router = APIRouter()
 
-# Feature groups for ablation (sqli_37)
-SQLI_37_GROUPS = {
-    "sql_keywords": [
-        "has_select", "has_union", "has_sleep", "has_or_1_equals_1", "has_drop",
-        "has_insert", "has_delete", "has_update", "has_information_schema",
-        "has_where", "has_order_by", "has_group_by", "has_having", "has_like",
-        "has_in", "has_hex", "has_char", "has_concat", "has_ascii", "has_substring",
-        "has_count", "has_benchmark", "has_waitfor", "has_exec", "has_xp_cmdshell",
-    ],
-    "structural": [
-        "quote_count", "comment_marker_count", "semicolon_count", "equals_count",
-        "parentheses_count",
-    ],
-    "lexical": [
-        "keyword_density", "sqli_entropy", "payload_length", "special_char_ratio",
-        "encoded_char_ratio", "logical_op_count", "comparison_count",
-    ],
-}
-
-# Feature groups for payload_only / hybrid
-PAYLOAD_GROUPS = {
-    "sqli": [
-        "has_select", "has_union", "has_sleep", "has_or_1_equals_1", "has_drop",
-        "has_insert", "has_delete", "has_update", "has_information_schema",
-        "quote_count", "comment_marker_count", "semicolon_count", "equals_count",
-        "parentheses_count", "keyword_density", "sqli_entropy",
-    ],
-    "xss": [
-        "has_script_tag", "has_javascript_protocol", "has_onerror", "has_onload",
-        "has_alert", "has_document_write", "has_eval", "html_tag_count",
-        "angle_bracket_count", "encoded_js_pattern", "suspicious_dom_keywords",
-        "svg_script_count",
-    ],
-    "csrf": [
-        "missing_csrf_token", "invalid_csrf_token", "cross_origin_flag",
-        "missing_referer", "state_change_request", "suspicious_cookie_usage",
-        "same_site_violation",
-    ],
-    "common": [
-        "request_method_get", "request_method_post", "payload_length",
-        "url_length", "number_count", "special_char_ratio", "encoded_char_ratio",
-        "whitespace_ratio", "has_cookies", "has_referer",
-    ],
-}
-
 
 class RobustnessRequest(BaseModel):
     model_id: Optional[str] = None
     data_path: str
     test_type: Literal["zero_out", "ablation"] = "zero_out"
     top_n: int = 10
-
-
-def _get_feature_groups(feature_mode: str, feature_columns: list) -> dict:
-    """Return feature groups for ablation based on model's feature mode."""
-    if feature_mode == "sqli_37":
-        groups = {k: [f for f in v if f in feature_columns] for k, v in SQLI_37_GROUPS.items()}
-    else:
-        groups = {k: [f for f in v if f in feature_columns] for k, v in PAYLOAD_GROUPS.items()}
-    return {k: v for k, v in groups.items() if v}
 
 
 @router.post("/analyze")
@@ -87,6 +33,7 @@ def analyze_robustness(req: RobustnessRequest, user: dict = Depends(get_current_
     project_root = Path(__file__).resolve().parents[3]
     sys.path.insert(0, str(project_root))
     from ml_pipeline.evaluation.robustness import RobustnessTester
+    from ml_pipeline.feature_extraction.features import ablation_groups_for_mode
 
     models_dir = resolve_data_path(settings.MODELS_DIR)
     model_id = req.model_id
@@ -139,7 +86,8 @@ def analyze_robustness(req: RobustnessRequest, user: dict = Depends(get_current_
             ],
         }
     else:
-        groups = _get_feature_groups(prep_data.get("feature_mode", "payload_only"), list(X.columns))
+        fm = prep_data.get("feature_mode", "payload_only")
+        groups = ablation_groups_for_mode(fm, list(X.columns))
         if not groups:
             raise HTTPException(400, "No feature groups for this model")
         results = tester.feature_ablation(X, y, groups)

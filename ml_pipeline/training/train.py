@@ -121,7 +121,7 @@ def _get_model(
     if algorithm == "logistic_regression":
         from sklearn.linear_model import LogisticRegression
         return LogisticRegression(
-            max_iter=1000,
+            max_iter=5000,
             random_state=random_state,
             class_weight="balanced",
             n_jobs=-1,
@@ -163,23 +163,15 @@ def _get_model(
         # CatBoost hard limit: depth <= 16.
         cat_depth = max_depth or 6
         cat_depth = max(1, min(int(cat_depth), 16))
-        # CatBoost GPU can fail at runtime on some CUDA builds; fallback to CPU.
-        try:
-            return cb.CatBoostClassifier(
-                iterations=n_estimators,
-                depth=cat_depth,
-                random_state=random_state,
-                verbose=0,
-                task_type="GPU",
-            )
-        except Exception:
-            return cb.CatBoostClassifier(
-                iterations=n_estimators,
-                depth=cat_depth,
-                random_state=random_state,
-                verbose=0,
-                task_type="CPU",
-            )
+        # Use CPU by default for stability across Windows/CUDA driver combinations.
+        # Native CatBoost CUDA errors can terminate the process before Python catches them.
+        return cb.CatBoostClassifier(
+            iterations=n_estimators,
+            depth=cat_depth,
+            random_state=random_state,
+            verbose=0,
+            task_type="CPU",
+        )
 
     raise ValueError(f"Unknown algorithm: {algorithm}")
 
@@ -237,7 +229,7 @@ class RandomForestTrainer:
 
     def _check_gpu_if_needed(self):
         """Verify GPU for algorithms that require it."""
-        gpu_algorithms = ["xgboost", "lightgbm", "catboost"]
+        gpu_algorithms = ["xgboost", "lightgbm"]
         if self.algorithm not in gpu_algorithms:
             return
         try:
@@ -258,9 +250,12 @@ class RandomForestTrainer:
         train_ratio: float = 0.70,
         val_ratio: float = 0.15,
         test_ratio: float = 0.15,
+        extended_research_metrics: bool = False,
+        bootstrap_resamples: int = 500,
     ) -> Dict[str, Any]:
         """Train model and return metrics."""
-        if self.algorithm in ("xgboost", "lightgbm", "catboost"):
+        # CatBoost runs on CPU in this project; only tree libs using CUDA need a GPU check.
+        if self.algorithm in ("xgboost", "lightgbm"):
             self._check_gpu_if_needed()
 
         self._log("Loading data...", 5, {"step": "load", "detail": "Reading dataset"})
@@ -367,6 +362,41 @@ class RandomForestTrainer:
         ]:
             pred = self.model_.predict(X_s)
             metrics[split_name] = self._compute_metrics(y_s, pred, X_s)
+
+        if extended_research_metrics:
+            from ml_pipeline.evaluation.calibration_metrics import (
+                low_margin_rate,
+                margin_summary,
+                multiclass_brier_score,
+                multiclass_ece,
+            )
+            from ml_pipeline.evaluation.bootstrap import bootstrap_statistic
+            from ml_pipeline.evaluation.robustness import RobustnessTester
+            from ml_pipeline.feature_extraction.features import ablation_groups_for_mode
+
+            proba_te = self.model_.predict_proba(X_test)
+            pred_te = self.model_.predict(X_test)
+            ece_val, _ece_bins = multiclass_ece(y_test, proba_te)
+            boot = bootstrap_statistic(
+                y_test,
+                pred_te,
+                lambda yt, yp: float(f1_score(yt, yp, average="macro", zero_division=0)),
+                n_resamples=bootstrap_resamples,
+                random_state=self.random_state,
+            )
+            groups = ablation_groups_for_mode(self._feature_mode, self.feature_columns_)
+            abla: Dict[str, Any] = {}
+            if groups:
+                tester = RobustnessTester(self.model_, self.preprocessor_, self.feature_columns_)
+                abla = tester.feature_ablation(X_test, y_test, groups)
+            metrics["research"] = {
+                "test_ece": ece_val,
+                "test_brier": float(multiclass_brier_score(y_test, proba_te)),
+                "margin": margin_summary(proba_te),
+                "low_margin_rate_lt_0.2": float(low_margin_rate(proba_te, 0.2)),
+                "bootstrap_f1_macro": boot,
+                "feature_ablation_accuracy": abla,
+            }
 
         metrics["train_time_seconds"] = train_time
         metrics["feature_importance"] = _get_feature_importances(self.model_, self.feature_columns_)

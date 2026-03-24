@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Database, Cpu, BarChart3, TestTube, Activity, TrendingUp, FlaskConical, ShieldAlert, Trash2 } from 'lucide-react'
+import { Database, Cpu, BarChart3, TestTube, Activity, TrendingUp, FlaskConical, ShieldAlert, Trash2, FileText } from 'lucide-react'
 import { training, datasets, models } from '../services/api'
+import { APP_TAGLINE, LOGO_ALT, REPRO_CLI_HINT } from '../researchBranding'
 
 const cards = [
-  { title: 'Dataset Generation', desc: 'Generate 5M samples', to: '/datasets/generate', icon: Database },
-  { title: 'Feature Extraction', desc: 'Extract security features', to: '/features/extract', icon: Cpu },
-  { title: 'Training', desc: 'Train Random Forest', to: '/training/config', icon: Cpu },
-  { title: 'Evaluation', desc: 'View metrics & confusion matrix', to: '/evaluation', icon: BarChart3 },
-  { title: 'Inference', desc: 'Test live payloads', to: '/inference', icon: TestTube },
-  { title: 'Vulnerability Test Lab', desc: 'Test SQLi, XSS, CSRF detection', to: '/test-lab', icon: FlaskConical },
-  { title: 'Real-time IDS', desc: 'Live intrusion detection dashboard', to: '/ids', icon: ShieldAlert },
+  { title: 'Synthetic dataset', desc: 'Controlled corpus, seeds, label noise', to: '/datasets/generate', icon: Database },
+  { title: 'Feature extraction', desc: 'Tabular SQLi / XSS / CSRF signals', to: '/features/extract', icon: Cpu },
+  { title: 'Train models', desc: 'Ensembles & baselines (multiclass)', to: '/training/config', icon: Cpu },
+  { title: 'Metrics & confusion', desc: 'Macro-F1, per-class, matrices', to: '/evaluation', icon: BarChart3 },
+  { title: 'Robustness & ablation', desc: 'Group ablation & sensitivity', to: '/robustness', icon: TestTube },
+  { title: 'Feature importance', desc: 'Interpretability for the paper', to: '/feature-importance', icon: BarChart3 },
+  { title: 'Scoring lab', desc: 'Single-request probabilities', to: '/inference', icon: TestTube },
+  { title: 'Payload experiments', desc: 'Curated attack-family checks', to: '/test-lab', icon: FlaskConical },
+  { title: 'IDS demo (stream)', desc: 'Live scoring — research only', to: '/ids', icon: ShieldAlert },
+  { title: 'Report export', desc: 'Figures & tables for write-ups', to: '/reports', icon: FileText },
 ]
 
 interface Job {
@@ -66,11 +70,14 @@ export default function Dashboard() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <img src="/shield.svg" alt="WebGuard RF" style={{ width: 56, height: 56 }} />
+        <img src="/shield.svg" alt={LOGO_ALT} style={{ width: 56, height: 56 }} />
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Dashboard</h1>
+          <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Research overview</h1>
           <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
-            Machine Learning driven detection of SQLi, XSS, and CSRF
+            {APP_TAGLINE}
+          </p>
+          <p style={{ color: 'var(--text-muted)', margin: '0.35rem 0 0', fontSize: '0.85rem' }}>
+            {REPRO_CLI_HINT}
           </p>
         </div>
       </div>
@@ -100,7 +107,7 @@ export default function Dashboard() {
         <div style={{ padding: '1.5rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
             <TrendingUp size={24} style={{ color: 'var(--accent)' }} />
-            <h3 style={{ margin: 0, fontSize: '1rem' }}>Model Accuracy</h3>
+            <h3 style={{ margin: 0, fontSize: '1rem' }}>Latest test accuracy</h3>
           </div>
           {displayAccuracy !== undefined ? (
             <p style={{ margin: 0, fontSize: '2rem', fontWeight: 700, color: 'var(--success)' }}>
@@ -178,12 +185,12 @@ export default function Dashboard() {
       )}
 
       <div style={{ marginTop: '2rem', padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 8, border: '1px solid var(--bg-card)' }}>
-        <h3 style={{ margin: '0 0 0.5rem' }}>Quick Start</h3>
+        <h3 style={{ margin: '0 0 0.5rem' }}>Experiment workflow</h3>
         <ol style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--text-muted)' }}>
-          <li>Generate or upload a dataset (5M samples recommended)</li>
-          <li>Extract features (payload-only or hybrid)</li>
-          <li>Configure and start training</li>
-          <li>Evaluate metrics and test live payloads</li>
+          <li>Generate or import a raw dataset (scale to your study; document class priors)</li>
+          <li>Extract tabular features (match train vs serve mode)</li>
+          <li>Train with fixed seeds; record macro-F1 and per-class metrics</li>
+          <li>Run robustness / ablation from the API UI; export reports; use the CLI suite for multi-seed ECE, Brier, and evasion JSON</li>
         </ol>
         <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
