@@ -3,4 +3,5 @@
 "iterations":[
 {"learn":[0.4485316215],"iteration":0,"passed_time":133.3017794,"remaining_time":13196.87616},
 {"learn":[0.3161108904],"iteration":1,"passed_time":283.4822122,"remaining_time":13890.6284},
-{
+{"learn":[0.2575889594],"iteration":2,"passed_time":499.5286934,"remaining_time":16151.42775}
+]}

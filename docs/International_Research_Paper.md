@@ -216,7 +216,7 @@ We presented a multiclass, tabular, ensemble-tree **methodology** for distinguis
 
 [1] OWASP Foundation, *OWASP Top 10:2021 – The Ten Most Critical Web Application Security Risks*, 2021. [https://owasp.org/www-project-top-ten/](https://owasp.org/www-project-top-ten/)
 
-[2] MITRE Corporation, *MITRE ATT&CK®*, enterprise matrix (web-related techniques). [https://attack.mitre.org/](https://attack.mitre.org/)
+[2] MITRE Corporation, *MITRE ATT&CK®*, enterprise matrix (web-related techniques). Accessed Mar. 24, 2026. [https://attack.mitre.org/](https://attack.mitre.org/)
 
 [3] N. Carlini *et al.*, “Towards Evaluating the Robustness of Neural Networks,” in *IEEE Symposium on Security and Privacy (SP)*, 2017.
 

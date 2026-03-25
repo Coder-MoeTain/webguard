@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Shield, Database, Cpu, BarChart3, TestTube, FileText, LogOut, FlaskConical, ShieldAlert } from 'lucide-react'
-import { APP_NAME_SHORT, APP_TAGLINE, LOGO_ALT } from '../researchBranding'
+import { APP_NAME_SHORT, LOGO_ALT } from '../researchBranding'
 
 const navItems = [
   { path: '/', label: 'Overview', icon: Shield },
@@ -42,9 +42,6 @@ export default function Layout() {
             <img src="/shield.svg" alt={LOGO_ALT} style={{ width: 36, height: 36 }} />
             <div>
               <h2 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--accent)' }}>{APP_NAME_SHORT}</h2>
-              <p style={{ margin: '0.25rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {APP_TAGLINE}
-              </p>
             </div>
           </div>
         </Link>
